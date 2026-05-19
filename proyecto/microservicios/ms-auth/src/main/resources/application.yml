@@ -16,3 +16,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+jwt:
+  secret: smartlogix-clave-super-secreta
+  expiration: 86400000
