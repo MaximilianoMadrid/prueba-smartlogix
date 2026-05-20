@@ -33,7 +33,7 @@ public class AuthController {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!passwordEncoder.matches(request.contraseña(), user.getContraseña())) {
+        if (!passwordEncoder.matches(request.contraseña(), user.getContrasena())) {
             return ResponseEntity.status(401).body("Credenciales incorrectas");
         }
 

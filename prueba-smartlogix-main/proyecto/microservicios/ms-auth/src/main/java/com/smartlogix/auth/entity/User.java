@@ -1,7 +1,10 @@
 package com.smartlogix.auth.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "usuarios")
@@ -21,7 +24,7 @@ public class User {
     @Column(unique = true)
     private String email;
 
-    private String contraseña;
+    private String contrasena;
 
     private String rol;
 }
