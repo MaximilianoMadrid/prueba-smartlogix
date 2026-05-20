@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findByClientEmail(String email);
-    List<Order> findByStatus(OrderStatus estado);
-    List<Order> findByChannel(String canal);
+    List<Order> findByEmail(String email);
+    List<Order> findByEstado(OrderStatus estado);
+    List<Order> findByCanal(String canal);
 }
