@@ -234,6 +234,9 @@ cd proyecto
 cd frontend
 npm install
 npm run dev
+en caso de no funcionar
+(npx pnpm install)
+(npx pnpm run dev)
 ```
 
 El frontend estará disponible en:
