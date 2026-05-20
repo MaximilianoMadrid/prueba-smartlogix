@@ -2,6 +2,8 @@ package com.smartlogix.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
