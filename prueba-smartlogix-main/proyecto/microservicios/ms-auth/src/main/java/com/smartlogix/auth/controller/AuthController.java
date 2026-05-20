@@ -30,10 +30,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!passwordEncoder.matches(request.contraseña(), user.getContrasena())) {
+        if (!passwordEncoder.matches(request.getContrasena(), user.getContrasena())) {
             return ResponseEntity.status(401).body("Credenciales incorrectas");
         }
 

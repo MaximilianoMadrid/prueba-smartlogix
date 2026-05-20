@@ -1,8 +1,10 @@
 package com.smartlogix.auth.dto;
 
-public record RegisterRequest(
-        String nombre,
-        String email,
-        String contraseña
-) {
+import lombok.Data;
+
+@Data
+public class RegisterRequest {
+    private String nombre;
+    private String email;
+    private String contrasena; 
 }

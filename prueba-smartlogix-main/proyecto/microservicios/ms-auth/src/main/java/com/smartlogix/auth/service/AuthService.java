@@ -17,9 +17,9 @@ public class AuthService {
     public void register(RegisterRequest request){
 
         User user = User.builder()
-                .nombre(request.nombre())
-                .email(request.email())
-                .contraseña(passwordEncoder.encode(request.contraseña()))
+                .nombre(request.getNombre())
+                .email(request.getEmail())
+                .contrasena(passwordEncoder.encode(request.getContrasena()))
                 .rol("USER")
                 .build();
 
