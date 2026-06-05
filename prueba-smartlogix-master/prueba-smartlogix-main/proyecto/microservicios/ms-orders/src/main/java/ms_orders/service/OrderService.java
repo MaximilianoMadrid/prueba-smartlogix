@@ -51,6 +51,13 @@ public class OrderService {
         return toResponse(orderRepository.save(order));
     }
 
+    public List<OrderResponse> getOrdersByStatus(OrderStatus estado) {
+    return orderRepository.findByEstado(estado)
+            .stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
+    }
+
     public void deleteOrder(Long id) {
         if (!orderRepository.existsById(id)) {
             throw new RuntimeException("Pedido no encontrado con id: " + id);
@@ -59,7 +66,7 @@ public class OrderService {
     }
 
     private OrderResponse toResponse(Order order) {
-        return OrderResponse.builder()
+        return OrderResponse.builder() 
                 .id(order.getId())
                 .email(order.getEmail())
                 .nombreProducto(order.getNombreProducto())
