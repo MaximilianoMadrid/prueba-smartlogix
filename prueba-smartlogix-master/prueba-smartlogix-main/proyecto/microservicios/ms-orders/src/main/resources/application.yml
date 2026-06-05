@@ -19,3 +19,4 @@ spring:
 
 jwt:
   secret: smartlogix-clave-super-secreta
+  expiration: 86400000
