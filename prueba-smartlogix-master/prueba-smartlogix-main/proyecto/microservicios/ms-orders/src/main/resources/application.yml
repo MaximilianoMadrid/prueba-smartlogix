@@ -18,5 +18,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret: smartlogix-clave-super-secreta
+  secret: smartlogix-clave-super-secreta-para-secretear-2026
   expiration: 86400000
