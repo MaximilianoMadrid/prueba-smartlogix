@@ -1,3 +1,3 @@
-public class NotificationRepository {
+public class InventoryRepository {
     
 }

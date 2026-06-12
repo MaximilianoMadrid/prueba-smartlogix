@@ -1,3 +1,3 @@
-public class notificationController {
+public class InventoryController {
     
 }

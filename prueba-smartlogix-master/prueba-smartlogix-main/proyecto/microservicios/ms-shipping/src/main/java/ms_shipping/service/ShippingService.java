@@ -1,3 +1,3 @@
-public class NotificationService {
+public class ShippingService {
     
 }

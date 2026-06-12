@@ -1,3 +1,3 @@
-public class NotificationResponse {
+public class InventoryResponse {
     
 }
