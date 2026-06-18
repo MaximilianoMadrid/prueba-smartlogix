@@ -20,8 +20,13 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             // Configuramos los permisos de las rutas
             .authorizeHttpRequests(auth -> auth
-                // Dejamos libre el acceso a cualquier ruta que empiece con /api/auth/ (register, login, etc.)
-                .requestMatchers("/api/auth/**", "/error").permitAll()
+                // Dejamos libre el acceso a cualquier ruta (register, login, etc.)
+                .requestMatchers(
+                "/api/auth/**",
+                "/error",
+                "/swagger-ui/**"
+                ,"/swagger-ui.html",
+                "/v3/api-docs/**").permitAll()
                 // Cualquier otra petición en la aplicación pedirá estar autenticado
                 .anyRequest().authenticated()
             );
