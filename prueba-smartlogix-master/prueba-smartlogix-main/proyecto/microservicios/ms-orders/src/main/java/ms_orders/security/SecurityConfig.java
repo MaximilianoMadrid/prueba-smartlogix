@@ -29,9 +29,9 @@ public class SecurityConfig {
                 "/v3/api-docs/**")
                 .permitAll()
                 .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+           )
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
+    return http.build();
     }
 }
