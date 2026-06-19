@@ -85,8 +85,17 @@ Servicio encargado de la autenticación y autorización de usuarios mediante JWT
 8081
 ```
 
+### Documentación API (Swagger)
+
+```bash
+http://localhost:8081/swagger-ui.html
 ---
 
+### Pruebas unitarias
+
+Cuenta con pruebas unitarias de la capa de servicio (`AuthServiceTest`) usando JUnit 5 y Mockito, validando el registro de usuarios y la encriptación de contraseñas antes de persistir.
+
+---
 ## ms-orders
 
 Servicio encargado de la administración de pedidos.
@@ -95,13 +104,43 @@ Servicio encargado de la administración de pedidos.
 
 * Crear pedidos
 * Listar pedidos
+* Buscar pedidos por id y por estado
 * Actualizar estado de pedidos
+* Eliminar pedidos
 * Persistencia con PostgreSQL
 
 ### Puerto
 
 ```bash
 8082
+```
+### Documentación API (Swagger)
+
+```bash
+http://localhost:8082/swagger-ui.html
+```
+### Pruebas unitarias
+
+Es el microservicio con mayor cobertura de pruebas del proyecto:
+
+* `OrderServiceTest`: lógica de creación y búsqueda de pedidos.
+* `OrderControllerTest`: los 6 endpoints del controlador (crear, listar, buscar por id, buscar por estado, actualizar estado, eliminar).
+* `JwtServiceTest`: generación y validación de tokens JWT (token válido, expirado, email distinto, token malformado).
+* `JwtFilterTest`: comportamiento del filtro de autenticación ante request sin header, header no-Bearer, token válido y token inválido.
+
+Cobertura medida con **JaCoCo: 74%** de instrucciones, por sobre el mínimo exigido (60%).
+
+Para generar el reporte de cobertura:
+
+```bash
+cd microservicios/ms-orders
+mvn clean test
+```
+
+El reporte HTML queda disponible en:
+
+```bash
+microservicios/ms-orders/target/site/jacoco/index.html
 ```
 
 ---
@@ -234,7 +273,7 @@ cd proyecto
 cd frontend
 npm install
 npm run dev
-en caso de no funcionar
+en caso de no funcionar usar:
 (npx pnpm install)
 (npx pnpm run dev)
 ```
@@ -307,6 +346,41 @@ jwt:
   secret: smartlogix-clave-super-secreta
   expiration: 86400000
 ```
+
+# Pruebas Unitarias y Cobertura
+ 
+El proyecto incorpora pruebas unitarias con **JUnit 5** y **Mockito**, enfocadas principalmente en el microservicio `ms-orders`, que concentra la lógica de negocio crítica del sistema (gestión de pedidos y seguridad JWT).
+
+## Resumen de cobertura (ms-orders)
+ 
+| Paquete | Cobertura |
+|---|---|
+| `ms_orders.service` | 84% |
+| `ms_orders.controller` | Cubierto vía tests unitarios del controlador |
+| `ms_orders.security` | Cubierto (JwtService y JwtFilter) |
+| **Total del módulo** | **74%** |
+ 
+Herramienta utilizada: [JaCoCo](https://www.jacoco.org/jacoco/) 0.8.12, integrado en el `pom.xml` de `ms-orders`.
+ 
+## Tipos de pruebas implementadas
+ 
+* **Pruebas de servicio**: validan la lógica de negocio (creación de pedidos, búsqueda por id, registro de usuarios, encriptación de contraseñas).
+* **Pruebas de controlador**: validan que cada endpoint delega correctamente al servicio y retorna la respuesta esperada.
+* **Pruebas de seguridad**: validan la generación/validación de tokens JWT y el comportamiento del filtro de autenticación ante distintos escenarios (sin token, token inválido, token válido).
+
+## Cómo ejecutar las pruebas y ver el reporte
+ 
+```bash
+cd microservicios/ms-orders
+mvn clean test
+```
+ 
+El informe de cobertura en HTML se genera automáticamente en:
+ 
+```bash
+microservicios/ms-orders/target/site/jacoco/index.html
+```
+ 
 
 ---
 
