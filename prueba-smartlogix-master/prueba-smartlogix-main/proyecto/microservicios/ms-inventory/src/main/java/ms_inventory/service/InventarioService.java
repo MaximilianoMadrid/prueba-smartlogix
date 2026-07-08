@@ -1,6 +1,6 @@
 package ms_inventory.service;
 
-import ms_inventory.dto.ProductoRequest;
+import ms_inventory.dto.InventoryRequest;
 import ms_inventory.dto.ProductoResponse;
 import ms_inventory.entity.Producto;
 import ms_inventory.enums.CategoriaProducto;
@@ -19,7 +19,7 @@ public class InventarioService {
         this.inventarioRepository = inventarioRepository;
     }
 
-    public ProductoResponse agregarProducto(ProductoRequest request) {
+    public ProductoResponse agregarProducto(InventoryRequest request) {
         if (inventarioRepository.findBySku(request.getSku()).isPresent()) {
             throw new RuntimeException("Ya existe un producto con SKU: " + request.getSku());
         }
@@ -68,7 +68,7 @@ public class InventarioService {
         return toResponse(inventarioRepository.save(producto));
     }
 
-    public ProductoResponse actualizarProducto(Long id, ProductoRequest request) {
+    public ProductoResponse actualizarProducto(Long id, InventoryRequest request) {
         Producto producto = inventarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
         producto.setNombre(request.getNombre());

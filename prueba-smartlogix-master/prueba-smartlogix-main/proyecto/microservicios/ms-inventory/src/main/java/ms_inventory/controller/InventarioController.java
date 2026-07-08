@@ -1,6 +1,6 @@
 package ms_inventory.controller;
 
-import ms_inventory.dto.inventoryRequest;
+import ms_inventory.dto.InventoryRequest;
 import ms_inventory.dto.ProductoResponse;
 import ms_inventory.enums.CategoriaProducto;
 import ms_inventory.service.InventarioService;
@@ -21,7 +21,7 @@ public class InventarioController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductoResponse> agregar(@Valid @RequestBody ProductoRequest request) {
+    public ResponseEntity<ProductoResponse> agregar(@Valid @RequestBody InventoryRequest request) {
         return ResponseEntity.ok(inventarioService.agregarProducto(request));
     }
 
@@ -61,7 +61,7 @@ public class InventarioController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductoResponse> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody ProductoRequest request) {
+            @Valid @RequestBody InventoryRequest request) {
         return ResponseEntity.ok(inventarioService.actualizarProducto(id, request));
     }
 
