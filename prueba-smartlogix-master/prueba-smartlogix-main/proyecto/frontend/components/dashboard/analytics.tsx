@@ -44,10 +44,10 @@ import {
 
 // Sample data for analytics
 const revenueData = [
-  { name: "Jan", revenue: 45000, orders: 420, profit: 12500 },
+  { name: "Ene", revenue: 45000, orders: 420, profit: 12500 },
   { name: "Feb", revenue: 38000, orders: 380, profit: 10200 },
   { name: "Mar", revenue: 52000, orders: 510, profit: 15800 },
-  { name: "Apr", revenue: 48000, orders: 465, profit: 13900 },
+  { name: "Abr", revenue: 48000, orders: 465, profit: 13900 },
   { name: "May", revenue: 61000, orders: 590, profit: 18200 },
   { name: "Jun", revenue: 55000, orders: 545, profit: 16500 },
   { name: "Jul", revenue: 72000, orders: 695, profit: 22400 },
@@ -61,21 +61,21 @@ const channelData = [
 ]
 
 const fulfillmentData = [
-  { day: "Mon", sameDay: 45, nextDay: 120, standard: 85 },
-  { day: "Tue", sameDay: 52, nextDay: 135, standard: 92 },
-  { day: "Wed", sameDay: 48, nextDay: 128, standard: 88 },
-  { day: "Thu", sameDay: 61, nextDay: 142, standard: 95 },
-  { day: "Fri", sameDay: 55, nextDay: 138, standard: 90 },
-  { day: "Sat", sameDay: 38, nextDay: 95, standard: 65 },
-  { day: "Sun", sameDay: 28, nextDay: 72, standard: 48 },
+  { day: "Lun", sameDay: 45, nextDay: 120, standard: 85 },
+  { day: "Mar", sameDay: 52, nextDay: 135, standard: 92 },
+  { day: "Mie", sameDay: 48, nextDay: 128, standard: 88 },
+  { day: "Jue", sameDay: 61, nextDay: 142, standard: 95 },
+  { day: "Vie", sameDay: 55, nextDay: 138, standard: 90 },
+  { day: "Sab", sameDay: 38, nextDay: 95, standard: 65 },
+  { day: "Dom", sameDay: 28, nextDay: 72, standard: 48 },
 ]
 
 const topProducts = [
-  { name: "Wireless Earbuds Pro", sales: 1245, revenue: 99480, growth: 15.2 },
-  { name: "USB-C Charging Cable", sales: 2890, revenue: 43350, growth: 8.5 },
-  { name: "Bluetooth Speaker Mini", sales: 856, revenue: 42757, growth: 22.1 },
-  { name: "Smart Watch Band", sales: 1542, revenue: 38537, growth: -3.2 },
-  { name: "Laptop Stand Aluminum", sales: 423, revenue: 29600, growth: 31.5 },
+  { name: "Audifonos Inalambricos Pro", sales: 1245, revenue: 99480, growth: 15.2 },
+  { name: "Cable de Carga USB-C", sales: 2890, revenue: 43350, growth: 8.5 },
+  { name: "Altavoz Bluetooth Mini", sales: 856, revenue: 42757, growth: 22.1 },
+  { name: "Correa para Smartwatch", sales: 1542, revenue: 38537, growth: -3.2 },
+  { name: "Soporte de Laptop Aluminio", sales: 423, revenue: 29600, growth: 31.5 },
 ]
 
 const carrierMetrics = [
@@ -91,8 +91,8 @@ export function AnalyticsPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-          <p className="text-muted-foreground">Track performance metrics and business insights.</p>
+          <h1 className="text-2xl font-bold text-foreground">Analiticas</h1>
+          <p className="text-muted-foreground">Rastrea metricas de rendimiento e informacion del negocio.</p>
         </div>
         <div className="flex items-center gap-3">
           <Select defaultValue="30d">
@@ -101,15 +101,15 @@ export function AnalyticsPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7d">Last 7 days</SelectItem>
-              <SelectItem value="30d">Last 30 days</SelectItem>
-              <SelectItem value="90d">Last 90 days</SelectItem>
-              <SelectItem value="1y">Last year</SelectItem>
+              <SelectItem value="7d">Ultimos 7 dias</SelectItem>
+              <SelectItem value="30d">Ultimos 30 dias</SelectItem>
+              <SelectItem value="90d">Ultimos 90 dias</SelectItem>
+              <SelectItem value="1y">Ultimo ano</SelectItem>
             </SelectContent>
           </Select>
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
-            Export
+            Exportar
           </Button>
         </div>
       </div>
@@ -128,10 +128,10 @@ export function AnalyticsPage() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-sm text-muted-foreground">Ingresos Totales</p>
               <p className="text-2xl font-bold text-foreground">$371,000</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">vs $313,800 last period</p>
+            <p className="mt-2 text-xs text-muted-foreground">vs $313,800 periodo anterior</p>
           </CardContent>
         </Card>
 
@@ -147,10 +147,10 @@ export function AnalyticsPage() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Total Orders</p>
+              <p className="text-sm text-muted-foreground">Pedidos Totales</p>
               <p className="text-2xl font-bold text-foreground">3,605</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">vs 3,204 last period</p>
+            <p className="mt-2 text-xs text-muted-foreground">vs 3,204 periodo anterior</p>
           </CardContent>
         </Card>
 
@@ -166,10 +166,10 @@ export function AnalyticsPage() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Conversion Rate</p>
+              <p className="text-sm text-muted-foreground">Tasa de Conversion</p>
               <p className="text-2xl font-bold text-foreground">3.2%</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">vs 3.04% last period</p>
+            <p className="mt-2 text-xs text-muted-foreground">vs 3.04% periodo anterior</p>
           </CardContent>
         </Card>
 
@@ -185,10 +185,10 @@ export function AnalyticsPage() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Avg Fulfillment Time</p>
+              <p className="text-sm text-muted-foreground">Tiempo Promedio de Cumplimiento</p>
               <p className="text-2xl font-bold text-foreground">1.8 days</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">vs 2.1 days last period</p>
+            <p className="mt-2 text-xs text-muted-foreground">vs 2.1 dias periodo anterior</p>
           </CardContent>
         </Card>
       </div>
@@ -198,8 +198,8 @@ export function AnalyticsPage() {
         {/* Revenue Chart */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Revenue & Orders Trend</CardTitle>
-            <CardDescription>Monthly revenue and order volume</CardDescription>
+            <CardTitle>Ingresos y Tendencia de Pedidos</CardTitle>
+            <CardDescription>Ingresos y volumen de pedidos mensuales</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-80">
@@ -256,8 +256,8 @@ export function AnalyticsPage() {
         {/* Channel Distribution */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Sales by Channel</CardTitle>
-            <CardDescription>Order distribution across sales channels</CardDescription>
+            <CardTitle>Ventas por Canal</CardTitle>
+            <CardDescription>Distribucion de pedidos entre canales de venta</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center">
@@ -306,8 +306,8 @@ export function AnalyticsPage() {
       {/* Fulfillment Chart */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle>Fulfillment by Shipping Speed</CardTitle>
-          <CardDescription>Daily orders by shipping method</CardDescription>
+          <CardTitle>Cumplimiento por Velocidad de Envío</CardTitle>
+          <CardDescription> Pedidos diarios por método de envío</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-72">
@@ -338,8 +338,8 @@ export function AnalyticsPage() {
         {/* Top Products */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Top Products</CardTitle>
-            <CardDescription>Best selling products by revenue</CardDescription>
+            <CardTitle>Productos Destacados</CardTitle>
+            <CardDescription>Productos mas vendidos por ingresos</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -372,8 +372,8 @@ export function AnalyticsPage() {
         {/* Carrier Performance */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Carrier Performance</CardTitle>
-            <CardDescription>On-time delivery and cost metrics</CardDescription>
+            <CardTitle>Rendimiento de Transportistas</CardTitle>
+            <CardDescription>Métricas de entrega a tiempo y costos</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -385,17 +385,17 @@ export function AnalyticsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">{carrier.carrier}</p>
-                      <p className="text-xs text-muted-foreground">{carrier.volume.toLocaleString()} shipments</p>
+                      <p className="text-xs text-muted-foreground">{carrier.volume.toLocaleString()} envíos</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="text-sm font-medium text-foreground">{carrier.onTime}%</p>
-                      <p className="text-xs text-muted-foreground">On-time</p>
+                      <p className="text-xs text-muted-foreground">A tiempo</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-foreground">${carrier.cost}</p>
-                      <p className="text-xs text-muted-foreground">Avg cost</p>
+                      <p className="text-xs text-muted-foreground">Costo promedio</p>
                     </div>
                   </div>
                 </div>

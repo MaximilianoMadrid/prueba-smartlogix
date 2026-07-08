@@ -68,7 +68,7 @@ const orders = [
     channel: "Shopify",
     date: "2024-01-15T10:30:00",
     shipping: "FedEx Express",
-    address: "123 Main St, Los Angeles, CA 90001",
+    address: "Av. Providencia 1234, Providencia, Región Metropolitana",
   },
   {
     id: "ORD-7890",
@@ -80,7 +80,7 @@ const orders = [
     channel: "Amazon",
     date: "2024-01-15T09:15:00",
     shipping: "UPS Ground",
-    address: "456 Oak Ave, Chicago, IL 60601",
+    address: "San Diego 456, Santiago Centro, Región Metropolitana",
   },
   {
     id: "ORD-7889",
@@ -92,7 +92,7 @@ const orders = [
     channel: "WooCommerce",
     date: "2024-01-15T08:45:00",
     shipping: "USPS Priority",
-    address: "789 Pine Rd, Miami, FL 33101",
+    address: "Av. Apoquindo 7890, Las Condes, Región Metropolitana",
   },
   {
     id: "ORD-7888",
@@ -104,7 +104,7 @@ const orders = [
     channel: "Shopify",
     date: "2024-01-14T16:20:00",
     shipping: "DHL Express",
-    address: "321 Elm St, San Francisco, CA 94102",
+    address: "Gran Avenida 3210, San Miguel, Región Metropolitana",
   },
   {
     id: "ORD-7887",
@@ -116,7 +116,7 @@ const orders = [
     channel: "Amazon",
     date: "2024-01-14T14:55:00",
     shipping: "FedEx Ground",
-    address: "654 Maple Dr, Seattle, WA 98101",
+    address: "Av. Irarrázaval 654, Ñuñoa, Región Metropolitana",
   },
   {
     id: "ORD-7886",
@@ -128,7 +128,7 @@ const orders = [
     channel: "Direct",
     date: "2024-01-14T12:30:00",
     shipping: "N/A",
-    address: "987 Cedar Ln, Austin, TX 78701",
+    address: "Av. Pajaritos 987, Maipú, Región Metropolitana",
   },
   {
     id: "ORD-7885",
@@ -140,7 +140,7 @@ const orders = [
     channel: "Shopify",
     date: "2024-01-14T10:00:00",
     shipping: "UPS Express",
-    address: "147 Birch St, Denver, CO 80201",
+    address: "Matucana 147, Quinta Normal, Región Metropolitana",
   },
   {
     id: "ORD-7884",
@@ -152,17 +152,18 @@ const orders = [
     channel: "WooCommerce",
     date: "2024-01-13T18:45:00",
     shipping: "USPS Priority",
-    address: "258 Walnut Ave, Boston, MA 02101",
+    address: "Av. Vicuña Mackenna 258, La Florida, Región Metropolitana",
   },
 ]
 
 const statusConfig = {
-  pending: { label: "Pending", icon: Clock, className: "bg-warning/10 text-warning" },
-  processing: { label: "Processing", icon: Package, className: "bg-chart-2/10 text-chart-2" },
-  shipped: { label: "Shipped", icon: Truck, className: "bg-primary/10 text-primary" },
-  delivered: { label: "Delivered", icon: CheckCircle2, className: "bg-success/10 text-success" },
-  cancelled: { label: "Cancelled", icon: XCircle, className: "bg-destructive/10 text-destructive" },
+  pending: { label: "Pendiente", icon: Clock, className: "bg-warning/10 text-warning" },
+  processing: { label: "Procesando", icon: Package, className: "bg-chart-2/10 text-chart-2" },
+  shipped: { label: "Enviado", icon: Truck, className: "bg-primary/10 text-primary" },
+  delivered: { label: "Entregado", icon: CheckCircle2, className: "bg-success/10 text-success" },
+  cancelled: { label: "Cancelado", icon: XCircle, className: "bg-destructive/10 text-destructive" },
 }
+
 
 type OrderStatus = keyof typeof statusConfig
 
@@ -206,17 +207,17 @@ export function OrdersPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Orders</h1>
-          <p className="text-muted-foreground">Manage and fulfill customer orders across all channels.</p>
+          <h1 className="text-2xl font-bold text-foreground">Pedidos</h1>
+          <p className="text-muted-foreground">Gestiona y cumple los pedidos de clientes en todos los canales.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
-            Export
+            Exportar
           </Button>
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
-            Create Order
+            Crear Pedido
           </Button>
         </div>
       </div>
@@ -224,11 +225,11 @@ export function OrdersPage() {
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {[
-          { label: "All Orders", value: "2,345", change: "+12.5%" },
-          { label: "Pending", value: "45", change: "-5.2%" },
-          { label: "Processing", value: "120", change: "+8.1%" },
-          { label: "Shipped", value: "456", change: "+15.3%" },
-          { label: "Delivered", value: "1,724", change: "+22.4%" },
+          { label: "Todos los Pedidos", value: "2,345", change: "+12.5%" },
+          { label: "Pendientes", value: "45", change: "-5.2%" },
+          { label: "Procesando", value: "120", change: "+8.1%" },
+          { label: "Enviados", value: "456", change: "+15.3%" },
+          { label: "Entregados", value: "1,724", change: "+22.4%" },
         ].map((stat) => (
           <Card key={stat.label} className="bg-card border-border">
             <CardContent className="p-4">
@@ -261,12 +262,12 @@ export function OrdersPage() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="processing">Processing</SelectItem>
-                  <SelectItem value="shipped">Shipped</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="all">Todos los Estados</SelectItem>
+                  <SelectItem value="pending">Pendiente</SelectItem>
+                  <SelectItem value="processing">Procesando</SelectItem>
+                  <SelectItem value="shipped">Enviado</SelectItem>
+                  <SelectItem value="delivered">Entregado</SelectItem>
+                  <SelectItem value="cancelled">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" size="icon">
@@ -276,10 +277,10 @@ export function OrdersPage() {
             {selectedOrders.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {selectedOrders.length} selected
+                  {selectedOrders.length} seleccionados
                 </span>
                 <Button variant="outline" size="sm">
-                  Bulk Actions
+                  Acciones en Lote
                 </Button>
               </div>
             )}
@@ -301,15 +302,15 @@ export function OrdersPage() {
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" className="h-8 gap-1 -ml-3 font-medium">
-                    Order <ArrowUpDown className="h-3 w-3" />
+                    Pedido <ArrowUpDown className="h-3 w-3" />
                   </Button>
                 </TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Channel</TableHead>
-                <TableHead>Items</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Canal</TableHead>
+                <TableHead>Articulos</TableHead>
                 <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Fecha</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -360,19 +361,19 @@ export function OrdersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => openOrderDetails(order)}>
                             <Eye className="mr-2 h-4 w-4" />
-                            View Details
+                            Ver Detalles
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Printer className="mr-2 h-4 w-4" />
-                            Print Label
+                            Imprimir Etiqueta
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Truck className="mr-2 h-4 w-4" />
-                            Ship Order
+                            Enviar Pedido
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -386,7 +387,7 @@ export function OrdersPage() {
           {/* Pagination */}
           <div className="flex items-center justify-between border-t border-border px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredOrders.length} of {orders.length} orders
+              Mostrando {filteredOrders.length} de {orders.length} pedidos
             </p>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" className="h-8 w-8">
@@ -413,35 +414,35 @@ export function OrdersPage() {
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Order {selectedOrder?.id}</DialogTitle>
+            <DialogTitle>Pedido {selectedOrder?.id}</DialogTitle>
             <DialogDescription>
-              Placed on {selectedOrder && new Date(selectedOrder.date).toLocaleString()}
+              Realizado el {selectedOrder && new Date(selectedOrder.date).toLocaleString()}
             </DialogDescription>
           </DialogHeader>
           {selectedOrder && (
             <Tabs defaultValue="details" className="mt-4">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="items">Items</TabsTrigger>
-                <TabsTrigger value="history">History</TabsTrigger>
+                <TabsTrigger value="details">Detalles</TabsTrigger>
+                <TabsTrigger value="items">Artículos</TabsTrigger>
+                <TabsTrigger value="history">Historial</TabsTrigger>
               </TabsList>
               <TabsContent value="details" className="space-y-4 mt-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Customer</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Cliente</h4>
                     <p className="text-foreground">{selectedOrder.customer}</p>
                     <p className="text-sm text-muted-foreground">{selectedOrder.email}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Shipping Address</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Direccion de Envio</h4>
                     <p className="text-foreground">{selectedOrder.address}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Shipping Method</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Metodo de Envio</h4>
                     <p className="text-foreground">{selectedOrder.shipping}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Status</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Estado</h4>
                     <Badge variant="secondary" className={statusConfig[selectedOrder.status as OrderStatus].className}>
                       {statusConfig[selectedOrder.status as OrderStatus].label}
                     </Badge>
@@ -460,7 +461,7 @@ export function OrdersPage() {
                       <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-lg bg-secondary" />
                         <div>
-                          <p className="font-medium">Product Item {i + 1}</p>
+                          <p className="font-medium">Producto {i + 1}</p>
                           <p className="text-sm text-muted-foreground">SKU-{1000 + i}</p>
                         </div>
                       </div>
@@ -475,10 +476,10 @@ export function OrdersPage() {
               <TabsContent value="history" className="mt-4">
                 <div className="space-y-4">
                   {[
-                    { event: "Order placed", time: "10:30 AM", date: "Jan 15" },
-                    { event: "Payment confirmed", time: "10:31 AM", date: "Jan 15" },
-                    { event: "Processing started", time: "11:00 AM", date: "Jan 15" },
-                    { event: "Shipped", time: "2:30 PM", date: "Jan 15" },
+                   { event: "Pedido realizado", time: "10:30", date: "15 Ene" },
+                    { event: "Pago confirmado", time: "10:31", date: "15 Ene" },
+                    { event: "Procesamiento iniciado", time: "11:00", date: "15 Ene" },
+                    { event: "Enviado", time: "14:30", date: "15 Ene" },
                   ].map((event, i) => (
                     <div key={i} className="flex items-start gap-4">
                       <div className="flex flex-col items-center">
@@ -488,7 +489,7 @@ export function OrdersPage() {
                       <div>
                         <p className="text-sm font-medium">{event.event}</p>
                         <p className="text-xs text-muted-foreground">
-                          {event.date} at {event.time}
+                          {event.date} a las {event.time}
                         </p>
                       </div>
                     </div>

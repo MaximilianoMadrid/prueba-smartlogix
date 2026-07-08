@@ -73,105 +73,105 @@ import {
 const inventoryItems = [
   {
     id: "SKU-4521",
-    name: "Wireless Earbuds Pro",
-    category: "Electronics",
+    name: "Audifonos Inalambricos Pro",
+    category: "Electronica",
     stock: 12,
     reserved: 5,
     threshold: 50,
     price: 79.99,
     cost: 35.00,
-    warehouse: "LA Warehouse",
+    warehouse: "Almacen LA",
     status: "low",
     lastUpdated: "2024-01-15T10:30:00",
   },
   {
     id: "SKU-3892",
-    name: "USB-C Charging Cable 6ft",
-    category: "Accessories",
+    name: "Cable de Carga USB-C 1.8m",
+    category: "Accesorios",
     stock: 28,
     reserved: 12,
     threshold: 100,
     price: 14.99,
     cost: 4.50,
-    warehouse: "Chicago DC",
+    warehouse: "CD Chicago",
     status: "low",
     lastUpdated: "2024-01-15T09:15:00",
   },
   {
     id: "SKU-2156",
-    name: "Phone Case Premium",
-    category: "Accessories",
+    name: "Funda de Telefono Premium",
+    category: "Accesorios",
     stock: 8,
     reserved: 3,
     threshold: 30,
     price: 29.99,
     cost: 8.00,
-    warehouse: "LA Warehouse",
+    warehouse: "Almacen LA",
     status: "critical",
     lastUpdated: "2024-01-15T08:45:00",
   },
   {
     id: "SKU-7823",
-    name: "Bluetooth Speaker Mini",
-    category: "Electronics",
+    name: "Altavoz Bluetooth Mini",
+    category: "Electronica",
     stock: 156,
     reserved: 24,
     threshold: 50,
     price: 49.99,
     cost: 22.00,
-    warehouse: "Miami Hub",
+    warehouse: "Hub Miami",
     status: "healthy",
     lastUpdated: "2024-01-14T16:20:00",
   },
   {
     id: "SKU-9012",
-    name: "Smart Watch Band",
+    name: "Correa para Smartwatch",
     category: "Wearables",
     stock: 89,
     reserved: 15,
     threshold: 40,
     price: 24.99,
     cost: 7.50,
-    warehouse: "Seattle Fulfillment",
+    warehouse: "Centro Seattle",
     status: "healthy",
     lastUpdated: "2024-01-14T14:55:00",
   },
   {
     id: "SKU-5634",
-    name: "Laptop Stand Aluminum",
-    category: "Office",
+    name: "Soporte de Laptop Aluminio",
+    category: "Oficina",
     stock: 0,
     reserved: 0,
     threshold: 25,
     price: 69.99,
     cost: 28.00,
-    warehouse: "LA Warehouse",
+    warehouse: "Almacen LA",
     status: "out",
     lastUpdated: "2024-01-14T12:30:00",
   },
   {
     id: "SKU-1278",
-    name: "Webcam HD 1080p",
-    category: "Electronics",
+    name: "Camara Web HD 1080p",
+    category: "Electronica",
     stock: 234,
     reserved: 45,
     threshold: 75,
     price: 89.99,
     cost: 42.00,
-    warehouse: "Chicago DC",
+    warehouse: "CD Chicago",
     status: "healthy",
     lastUpdated: "2024-01-14T10:00:00",
   },
   {
     id: "SKU-8456",
-    name: "Desk Organizer Set",
-    category: "Office",
+    name: "Set Organizador de Escritorio",
+    category: "Oficina",
     stock: 67,
     reserved: 8,
     threshold: 30,
     price: 34.99,
     cost: 12.00,
-    warehouse: "Miami Hub",
+    warehouse: "Hub Miami",
     status: "healthy",
     lastUpdated: "2024-01-13T18:45:00",
   },
@@ -188,10 +188,10 @@ const stockHistoryData = [
 ]
 
 const statusConfig = {
-  healthy: { label: "Healthy", className: "bg-success/10 text-success" },
-  low: { label: "Low Stock", className: "bg-warning/10 text-warning" },
-  critical: { label: "Critical", className: "bg-destructive/10 text-destructive" },
-  out: { label: "Out of Stock", className: "bg-muted text-muted-foreground" },
+  healthy: { label: "Saludable", className: "bg-success/10 text-success" },
+  low: { label: "Stock Bajo", className: "bg-warning/10 text-warning" },
+  critical: { label: "Critico", className: "bg-destructive/10 text-destructive" },
+  out: { label: "Sin Stock", className: "bg-muted text-muted-foreground" },
 }
 
 type InventoryStatus = keyof typeof statusConfig
@@ -238,29 +238,29 @@ export function InventoryPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Inventory</h1>
-          <p className="text-muted-foreground">Track and manage your product inventory across warehouses.</p>
+          <h1 className="text-2xl font-bold text-foreground">Inventario</h1>
+          <p className="text-muted-foreground">Rastrea y gestiona el inventario de tus productos en todos los almacenes.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
-            Export
+            Exportar
           </Button>
           <Button variant="outline" className="gap-2">
             <RefreshCcw className="h-4 w-4" />
-            Sync
+            Sincronizar
           </Button>
-          <Dialog open={addItemOpen} onOpenChange={setAddItemOpen}>
+           <Dialog open={addItemOpen} onOpenChange={setAddItemOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Add Item
+                Agregar Articulo
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Inventory Item</DialogTitle>
-                <DialogDescription>Add a new product to your inventory.</DialogDescription>
+                <DialogTitle>Agregar Articulo al Inventario</DialogTitle>
+                <DialogDescription>Agrega un nuevo producto a tu inventario.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
@@ -268,12 +268,12 @@ export function InventoryPage() {
                   <Input id="sku" placeholder="SKU-XXXX" />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Product Name</Label>
-                  <Input id="name" placeholder="Enter product name" />
+                  <Label htmlFor="name">Nombre del Producto</Label>
+                  <Input id="name" placeholder="Ingresa el nombre del producto" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Category</Label>
+                    <Label htmlFor="category">Categoria</Label>
                     <Select>
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
@@ -284,40 +284,40 @@ export function InventoryPage() {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                 </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="warehouse">Warehouse</Label>
+                    <Label htmlFor="warehouse">Almacen</Label>
                     <Select>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select warehouse" />
+                        <SelectValue placeholder="Selecciona almacen" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="la">LA Warehouse</SelectItem>
-                        <SelectItem value="chicago">Chicago DC</SelectItem>
-                        <SelectItem value="miami">Miami Hub</SelectItem>
-                        <SelectItem value="seattle">Seattle Fulfillment</SelectItem>
+                        <SelectItem value="Providencia">Almacen Providencia</SelectItem>
+                        <SelectItem value="Las condes">Almacen Las condes</SelectItem>
+                        <SelectItem value="Quinta normal">Almacen Quinta normal</SelectItem>
+                        <SelectItem value="S. centro">Almacen S. centro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="stock">Initial Stock</Label>
+                    <Label htmlFor="stock">Stock Inicial</Label>
                     <Input id="stock" type="number" placeholder="0" />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="price">Price</Label>
+                    <Label htmlFor="price">Precio</Label>
                     <Input id="price" type="number" placeholder="0.00" />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="threshold">Low Stock Alert</Label>
+                    <Label htmlFor="threshold">Alerta de Stock Bajo</Label>
                     <Input id="threshold" type="number" placeholder="50" />
                   </div>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setAddItemOpen(false)}>Cancel</Button>
-                <Button onClick={() => setAddItemOpen(false)}>Add Item</Button>
+                <Button variant="outline" onClick={() => setAddItemOpen(false)}>Cancelar</Button>
+                <Button onClick={() => setAddItemOpen(false)}>Agregar Articulo</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -335,7 +335,7 @@ export function InventoryPage() {
               <TrendingUp className="h-4 w-4 text-success" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Total Items</p>
+              <p className="text-sm text-muted-foreground">Articulos Totales</p>
               <p className="text-2xl font-bold text-foreground">{totalItems.toLocaleString()}</p>
             </div>
           </CardContent>
@@ -350,7 +350,7 @@ export function InventoryPage() {
               <TrendingUp className="h-4 w-4 text-success" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Total Value</p>
+              <p className="text-sm text-muted-foreground">Valor Total</p>
               <p className="text-2xl font-bold text-foreground">${totalValue.toLocaleString()}</p>
             </div>
           </CardContent>
@@ -365,7 +365,7 @@ export function InventoryPage() {
               <TrendingDown className="h-4 w-4 text-warning" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Low Stock Items</p>
+              <p className="text-sm text-muted-foreground">Articulos con Bajo Stock</p>
               <p className="text-2xl font-bold text-foreground">{lowStockCount}</p>
             </div>
           </CardContent>
@@ -379,7 +379,7 @@ export function InventoryPage() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Out of Stock</p>
+              <p className="text-sm text-muted-foreground">Fuera de Stock</p>
               <p className="text-2xl font-bold text-foreground">{outOfStockCount}</p>
             </div>
           </CardContent>
@@ -389,8 +389,8 @@ export function InventoryPage() {
       {/* Stock Trend Chart */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle>Stock Level Trend</CardTitle>
-          <CardDescription>Total inventory levels over the past week</CardDescription>
+          <CardTitle>Tendencia de Nivel de Stock</CardTitle>
+          <CardDescription>Niveles totales de inventario durante la última semana</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-64">
@@ -445,11 +445,11 @@ export function InventoryPage() {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="healthy">Healthy</SelectItem>
-                  <SelectItem value="low">Low Stock</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="out">Out of Stock</SelectItem>
+                  <SelectItem value="all">Todos los Estados</SelectItem>
+                  <SelectItem value="healthy">Saludable</SelectItem>
+                  <SelectItem value="low">Stock Bajo</SelectItem>
+                  <SelectItem value="critical">Critico</SelectItem>
+                  <SelectItem value="out">Sin Stock</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -457,7 +457,7 @@ export function InventoryPage() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="all">Todas las Categorías</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
@@ -470,10 +470,10 @@ export function InventoryPage() {
             {selectedItems.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  {selectedItems.length} selected
+                  {selectedItems.length} seleccionados
                 </span>
                 <Button variant="outline" size="sm">
-                  Bulk Update
+                  Actualizar en Lote
                 </Button>
               </div>
             )}
@@ -495,16 +495,16 @@ export function InventoryPage() {
                 </TableHead>
                 <TableHead>
                   <Button variant="ghost" className="h-8 gap-1 -ml-3 font-medium">
-                    Product <ArrowUpDown className="h-3 w-3" />
+                    Producto <ArrowUpDown className="h-3 w-3" />
                   </Button>
                 </TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Warehouse</TableHead>
+                <TableHead>Categoria</TableHead>
+                <TableHead>Almacen</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
-                <TableHead className="text-right">Reserved</TableHead>
-                <TableHead className="text-right">Available</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Reservado</TableHead>
+                <TableHead className="text-right">Disponible</TableHead>
+                <TableHead className="text-right">Precio</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -563,20 +563,20 @@ export function InventoryPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem>
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit Item
+                            Editar Articulo
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <RefreshCcw className="mr-2 h-4 w-4" />
-                            Adjust Stock
+                            Ajustar Stock
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-destructive">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
+                            Eliminar Articulo
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -590,7 +590,7 @@ export function InventoryPage() {
           {/* Pagination */}
           <div className="flex items-center justify-between border-t border-border px-4 py-3">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredItems.length} of {inventoryItems.length} items
+              Mostrando {filteredItems.length} de {inventoryItems.length} artículos
             </p>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="icon" className="h-8 w-8">

@@ -60,9 +60,9 @@ const recentOrders = [
 ]
 
 const lowStockItems = [
-  { sku: "SKU-4521", name: "Wireless Earbuds Pro", stock: 12, threshold: 50 },
-  { sku: "SKU-3892", name: "USB-C Charging Cable", stock: 28, threshold: 100 },
-  { sku: "SKU-2156", name: "Phone Case Premium", stock: 8, threshold: 30 },
+  { sku: "SKU-4521", name: "Audifonos Inalambricos Pro", stock: 12, threshold: 50 },
+  { sku: "SKU-3892", name: "Cable de Carga USB-C", stock: 28, threshold: 100 },
+  { sku: "SKU-2156", name: "Funda de Telefono Premium", stock: 8, threshold: 30 },
 ]
 
 const carrierPerformance = [
@@ -72,6 +72,13 @@ const carrierPerformance = [
   { name: "USPS", onTime: 85, volume: 420 },
 ]
 
+const statusLabels: Record<string, string> = {
+  delivered: "Entregado",
+  shipped: "Enviado",
+  processing: "Procesando",
+  pending: "Pendiente",
+}
+
 export function DashboardOverview() {
   return (
     <div className="space-y-6">
@@ -79,11 +86,11 @@ export function DashboardOverview() {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back! Here&apos;s what&apos;s happening with your logistics.</p>
+          <p className="text-muted-foreground">Bienvenido de nuevo. Esto es lo que esta pasando con tu logistica.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline">Download Report</Button>
-          <Button>New Order</Button>
+          <Button variant="outline">Descargar Reporte</Button>
+          <Button>Nuevo Pedido</Button>
         </div>
       </div>
 
@@ -101,10 +108,10 @@ export function DashboardOverview() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-sm text-muted-foreground">Ingresos Totales</p>
               <p className="text-2xl font-bold text-foreground">$45,231.89</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">+$5,234.00 from last month</p>
+            <p className="mt-2 text-xs text-muted-foreground">+$5,234.00 vs. el mes pasado</p>
           </CardContent>
         </Card>
 
@@ -120,10 +127,10 @@ export function DashboardOverview() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Total Orders</p>
+              <p className="text-sm text-muted-foreground">Pedidos Totales</p>
               <p className="text-2xl font-bold text-foreground">2,345</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">+180 from last month</p>
+            <p className="mt-2 text-xs text-muted-foreground">+180 vs. el mes pasado</p>
           </CardContent>
         </Card>
 
@@ -139,10 +146,10 @@ export function DashboardOverview() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">In Transit</p>
+              <p className="text-sm text-muted-foreground">En Tránsito</p>
               <p className="text-2xl font-bold text-foreground">456</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">-12 from yesterday</p>
+            <p className="mt-2 text-xs text-muted-foreground">-12 vs. ayer</p>
           </CardContent>
         </Card>
 
@@ -158,21 +165,21 @@ export function DashboardOverview() {
               </Badge>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Inventory Items</p>
+              <p className="text-sm text-muted-foreground">Artículos en Inventario</p>
               <p className="text-2xl font-bold text-foreground">12,543</p>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">3 items low on stock</p>
+            <p className="mt-2 text-xs text-muted-foreground">3 artículos con bajo stock</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts Row */}
+      {/* Resumen de Ingresos */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Revenue Chart */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Revenue Overview</CardTitle>
-            <CardDescription>Monthly revenue and order trends</CardDescription>
+            <CardTitle>Resumen de Ingresos</CardTitle>
+            <CardDescription>Tendencias mensuales de ingresos y pedidos</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-80">
@@ -208,11 +215,11 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
 
-        {/* Order Status Chart */}
+        {/* Distribución del Estado de los Pedidos */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle>Order Status Distribution</CardTitle>
-            <CardDescription>Current order breakdown by status</CardDescription>
+            <CardTitle>Distribución del Estado de los Pedidos</CardTitle>
+            <CardDescription>Desglose actual de los pedidos por estado</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center">
@@ -257,16 +264,16 @@ export function DashboardOverview() {
         </Card>
       </div>
 
-      {/* Tables Row */}
+      {/* Pedidos Recientes */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Orders */}
         <Card className="bg-card border-border lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Recent Orders</CardTitle>
-              <CardDescription>Latest order activity across all channels</CardDescription>
+              <CardTitle>Pedidos Recientes</CardTitle>
+              <CardDescription>Ultima actividad de pedidos en todos los canales</CardDescription>
             </div>
-            <Button variant="outline" size="sm">View All</Button>
+            <Button variant="outline" size="sm">Ver Todos</Button>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -310,14 +317,14 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
 
-        {/* Low Stock Alerts */}
+        {/* Alertas de Stock Bajo */}
         <Card className="bg-card border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-warning" />
-              <CardTitle>Low Stock Alerts</CardTitle>
+              <CardTitle>Alertas de Stock Bajo</CardTitle>
             </div>
-            <CardDescription>Items that need restocking</CardDescription>
+            <CardDescription>Artículos que necesitan reabastecimiento</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -337,17 +344,17 @@ export function DashboardOverview() {
               ))}
             </div>
             <Button variant="outline" className="mt-4 w-full">
-              Manage Inventory
+              Gestionar Inventario
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Carrier Performance */}
+      {/* Rendimiento de Transportistas */}
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle>Carrier Performance</CardTitle>
-          <CardDescription>On-time delivery rates by carrier</CardDescription>
+          <CardTitle>Rendimiento de Transportistas</CardTitle>
+          <CardDescription>Tipos de entrega a tiempo por transportista</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-64">
@@ -363,7 +370,7 @@ export function DashboardOverview() {
                     borderRadius: "8px",
                     color: "oklch(0.95 0 0)",
                   }}
-                  formatter={(value: number) => [`${value}%`, "On-Time Rate"]}
+                  formatter={(value: number) => [`${value}%`, "Tasa de Entrega a Tiempo"]}
                 />
                 <Bar dataKey="onTime" fill="oklch(0.68 0.18 45)" radius={[0, 4, 4, 0]} />
               </BarChart>

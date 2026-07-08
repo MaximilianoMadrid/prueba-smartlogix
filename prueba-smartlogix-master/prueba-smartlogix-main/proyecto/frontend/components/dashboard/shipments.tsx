@@ -69,15 +69,15 @@ const shipments = [
     service: "Express",
     tracking: "794644790191",
     status: "in_transit",
-    origin: "Los Angeles, CA",
-    destination: "Miami, FL",
+    origin: "Providencia",
+    destination: "Maipú",
     estimatedDelivery: "2024-01-17",
-    weight: "2.5 lbs",
+    weight: "1.1 kg",
     createdAt: "2024-01-15T10:30:00",
     events: [
-      { status: "Picked up", location: "Los Angeles, CA", time: "2024-01-15T14:30:00" },
-      { status: "In transit", location: "Phoenix, AZ", time: "2024-01-15T22:15:00" },
-      { status: "Arrived at facility", location: "Houston, TX", time: "2024-01-16T06:45:00" },
+      { status: "Recogido", location: "Providencia", time: "2024-01-15T14:30:00" },
+      { status: "En transito", location: "Santiago Centro", time: "2024-01-15T22:15:00" },
+      { status: "Llego a instalacion", location: "Cerrillos", time: "2024-01-16T06:45:00" },
     ],
   },
   {
@@ -88,16 +88,16 @@ const shipments = [
     service: "Ground",
     tracking: "1Z999AA10123456784",
     status: "delivered",
-    origin: "Chicago, IL",
-    destination: "Seattle, WA",
+    origin: "Las condes",
+    destination: "Ñuñoa",
     estimatedDelivery: "2024-01-14",
-    weight: "4.2 lbs",
+    weight: "1.9 kg",
     createdAt: "2024-01-10T09:15:00",
     events: [
-      { status: "Picked up", location: "Chicago, IL", time: "2024-01-10T11:00:00" },
-      { status: "In transit", location: "Denver, CO", time: "2024-01-12T08:30:00" },
-      { status: "Out for delivery", location: "Seattle, WA", time: "2024-01-14T07:00:00" },
-      { status: "Delivered", location: "Seattle, WA", time: "2024-01-14T14:23:00" },
+      { status: "Recogido", location: "Las condes", time: "2024-01-10T11:00:00" },
+      { status: "En transito", location: "Providencia", time: "2024-01-12T08:30:00" },
+      { status: "En reparto", location: "Ñuñoa", time: "2024-01-14T07:00:00" },
+      { status: "Entregado", location: "Ñuñoa", time: "2024-01-14T14:23:00" },
     ],
   },
   {
@@ -108,13 +108,13 @@ const shipments = [
     service: "Express",
     tracking: "1234567890",
     status: "processing",
-    origin: "Denver, CO",
-    destination: "New York, NY",
+    origin: "Quinta normal",
+    destination: "La Florida",
     estimatedDelivery: "2024-01-18",
-    weight: "6.8 lbs",
+    weight: "3.0 kg",
     createdAt: "2024-01-15T08:45:00",
     events: [
-      { status: "Label created", location: "Denver, CO", time: "2024-01-15T08:45:00" },
+      { status: "Etiqueta creada", location: "Quinta normal", time: "2024-01-15T08:45:00" },
     ],
   },
   {
@@ -125,14 +125,14 @@ const shipments = [
     service: "Priority",
     tracking: "9400111899223033005291",
     status: "delivered",
-    origin: "Boston, MA",
-    destination: "Philadelphia, PA",
+    origin: "S. centro",
+    destination: "San Miguel",
     estimatedDelivery: "2024-01-13",
-    weight: "1.8 lbs",
+    weight: "0.8 kg",
     createdAt: "2024-01-11T16:20:00",
     events: [
-      { status: "Picked up", location: "Boston, MA", time: "2024-01-11T17:00:00" },
-      { status: "Delivered", location: "Philadelphia, PA", time: "2024-01-13T11:45:00" },
+      { status: "Recogido", location: "S. centro", time: "2024-01-11T17:00:00" },
+      { status: "Entregado", location: "San Miguel", time: "2024-01-13T11:45:00" },
     ],
   },
   {
@@ -143,14 +143,14 @@ const shipments = [
     service: "Ground",
     tracking: "794644790192",
     status: "delayed",
-    origin: "San Francisco, CA",
-    destination: "Austin, TX",
+    origin: "Quinta normal",
+    destination: "Puente Alto",
     estimatedDelivery: "2024-01-16",
-    weight: "3.1 lbs",
+    weight: "1.4 kg",
     createdAt: "2024-01-12T14:55:00",
     events: [
-      { status: "Picked up", location: "San Francisco, CA", time: "2024-01-12T16:00:00" },
-      { status: "Delay - Weather conditions", location: "Albuquerque, NM", time: "2024-01-15T10:30:00" },
+      { status: "Recogido", location: "Quinta normal", time: "2024-01-12T16:00:00" },
+      { status: "Retraso - Condiciones climaticas", location: "Macul", time: "2024-01-15T10:30:00" },
     ],
   },
   {
@@ -161,18 +161,18 @@ const shipments = [
     service: "Express",
     tracking: "1Z999AA10123456785",
     status: "out_for_delivery",
-    origin: "Miami, FL",
-    destination: "Atlanta, GA",
+    origin: "Providencia",
+    destination: "Peñalolén",
     estimatedDelivery: "2024-01-16",
-    weight: "2.0 lbs",
+    weight: "0.9 kg",
     createdAt: "2024-01-14T10:00:00",
     events: [
-      { status: "Picked up", location: "Miami, FL", time: "2024-01-14T12:00:00" },
-      { status: "In transit", location: "Jacksonville, FL", time: "2024-01-15T05:30:00" },
-      { status: "Out for delivery", location: "Atlanta, GA", time: "2024-01-16T07:00:00" },
+      { status: "Recogido", location: "Providencia", time: "2024-01-14T12:00:00" },
+      { status: "En transito", location: "Ñuñoa", time: "2024-01-15T05:30:00" },
+      { status: "En reparto", location: "Peñalolén", time: "2024-01-16T07:00:00" },
     ],
   },
-]
+];
 
 const statusConfig = {
   processing: { label: "Processing", icon: Package, className: "bg-chart-2/10 text-chart-2" },
@@ -225,17 +225,17 @@ export function ShipmentsPage() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Shipments</h1>
-          <p className="text-muted-foreground">Track and manage all shipments across carriers.</p>
+          <h1 className="text-2xl font-bold text-foreground">Envios</h1>
+          <p className="text-muted-foreground">Rastrea y gestiona todos los envios entre transportistas.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
-            Export
+            Exportar
           </Button>
           <Button variant="outline" className="gap-2">
             <RefreshCcw className="h-4 w-4" />
-            Sync All
+            Sincronizar Todo
           </Button>
         </div>
       </div>
@@ -250,7 +250,7 @@ export function ShipmentsPage() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">In Transit</p>
+              <p className="text-sm text-muted-foreground">En Transito</p>
               <p className="text-2xl font-bold text-foreground">{inTransitCount}</p>
             </div>
           </CardContent>
@@ -264,7 +264,7 @@ export function ShipmentsPage() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Delivered Today</p>
+              <p className="text-sm text-muted-foreground">Entregados Hoy</p>
               <p className="text-2xl font-bold text-foreground">{deliveredCount}</p>
             </div>
           </CardContent>
@@ -278,7 +278,7 @@ export function ShipmentsPage() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Delayed</p>
+              <p className="text-sm text-muted-foreground">Retrasados</p>
               <p className="text-2xl font-bold text-foreground">{delayedCount}</p>
             </div>
           </CardContent>
@@ -292,7 +292,7 @@ export function ShipmentsPage() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Processing</p>
+              <p className="text-sm text-muted-foreground">Procesando</p>
               <p className="text-2xl font-bold text-foreground">{processingCount}</p>
             </div>
           </CardContent>
@@ -317,12 +317,12 @@ export function ShipmentsPage() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="in_transit">In Transit</SelectItem>
-                <SelectItem value="out_for_delivery">Out for Delivery</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="delayed">Delayed</SelectItem>
+                <SelectItem value="all">Todos los Estados</SelectItem>
+                <SelectItem value="processing">Procesando</SelectItem>
+                <SelectItem value="in_transit">En Transito</SelectItem>
+                <SelectItem value="out_for_delivery">En Reparto</SelectItem>
+                <SelectItem value="delivered">Entregado</SelectItem>
+                <SelectItem value="delayed">Retrasado</SelectItem>
               </SelectContent>
             </Select>
             <Select value={carrierFilter} onValueChange={setCarrierFilter}>
@@ -330,7 +330,7 @@ export function ShipmentsPage() {
                 <SelectValue placeholder="Carrier" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Carriers</SelectItem>
+                <SelectItem value="all">Todos los Transportistas</SelectItem>
                 {carriers.map((carrier) => (
                   <SelectItem key={carrier} value={carrier}>{carrier}</SelectItem>
                 ))}
@@ -388,7 +388,7 @@ export function ShipmentsPage() {
                   <div className="flex items-center gap-3 text-sm">
                     <div className="text-right">
                       <p className="font-medium text-foreground">{shipment.origin.split(",")[0]}</p>
-                      <p className="text-xs text-muted-foreground">Origin</p>
+                      <p className="text-xs text-muted-foreground">Origen</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 rounded-full bg-primary" />
@@ -402,7 +402,7 @@ export function ShipmentsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">{shipment.destination.split(",")[0]}</p>
-                      <p className="text-xs text-muted-foreground">Destination</p>
+                      <p className="text-xs text-muted-foreground">Destino</p>
                     </div>
                   </div>
 
@@ -425,19 +425,19 @@ export function ShipmentsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openShipmentDetails(shipment); }}>
                           <Eye className="mr-2 h-4 w-4" />
-                          View Details
+                          Ver Detalles
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <ExternalLink className="mr-2 h-4 w-4" />
-                          Track on Carrier Site
+                          Rastrear en Sitio del Transportista
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Printer className="mr-2 h-4 w-4" />
-                          Print Label
+                          Imprimir Etiqueta
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -455,7 +455,7 @@ export function ShipmentsPage() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              Shipment {selectedShipment?.id}
+              Envio {selectedShipment?.id}
               {selectedShipment && (
                 <Badge variant="secondary" className={statusConfig[selectedShipment.status as ShipmentStatus].className}>
                   {statusConfig[selectedShipment.status as ShipmentStatus].label}
@@ -463,20 +463,20 @@ export function ShipmentsPage() {
               )}
             </DialogTitle>
             <DialogDescription>
-              Order {selectedShipment?.orderId} • {selectedShipment?.carrier} {selectedShipment?.service}
+              Pedido {selectedShipment?.orderId} • {selectedShipment?.carrier} {selectedShipment?.service}
             </DialogDescription>
           </DialogHeader>
           {selectedShipment && (
             <Tabs defaultValue="tracking" className="mt-4">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="tracking">Tracking</TabsTrigger>
-                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="tracking">Rastreo</TabsTrigger>
+                <TabsTrigger value="details">Detalles</TabsTrigger>
               </TabsList>
               <TabsContent value="tracking" className="mt-4 space-y-4">
                 {/* Progress bar */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Delivery Progress</span>
+                    <span className="text-muted-foreground">Progreso de Entrega</span>
                     <span className="font-medium text-foreground">
                       {selectedShipment.status === "delivered" ? "Completed" : "In Progress"}
                     </span>
@@ -515,27 +515,27 @@ export function ShipmentsPage() {
               <TabsContent value="details" className="mt-4 space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Tracking Number</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Numero de Rastreo</h4>
                     <p className="text-foreground font-mono">{selectedShipment.tracking}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Carrier</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Transportista</h4>
                     <p className="text-foreground">{selectedShipment.carrier} {selectedShipment.service}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Origin</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Origen</h4>
                     <p className="text-foreground">{selectedShipment.origin}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Destination</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Destino</h4>
                     <p className="text-foreground">{selectedShipment.destination}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Weight</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Peso</h4>
                     <p className="text-foreground">{selectedShipment.weight}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Estimated Delivery</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground">Entrega Estimada</h4>
                     <p className="text-foreground">
                       {new Date(selectedShipment.estimatedDelivery).toLocaleDateString()}
                     </p>
@@ -545,11 +545,11 @@ export function ShipmentsPage() {
                 <div className="flex gap-2">
                   <Button variant="outline" className="flex-1 gap-2">
                     <ExternalLink className="h-4 w-4" />
-                    Track on {selectedShipment.carrier}
+                    Rastrear en {selectedShipment.carrier}
                   </Button>
                   <Button variant="outline" className="flex-1 gap-2">
                     <Printer className="h-4 w-4" />
-                    Print Label
+                    Imprimir Etiqueta
                   </Button>
                 </div>
               </TabsContent>
