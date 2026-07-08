@@ -1,6 +1,6 @@
 package ms_inventory.controller;
 
-import ms_inventory.dto.ProductoRequest;
+import ms_inventory.dto.inventoryRequest;
 import ms_inventory.dto.ProductoResponse;
 import ms_inventory.enums.CategoriaProducto;
 import ms_inventory.service.InventarioService;
