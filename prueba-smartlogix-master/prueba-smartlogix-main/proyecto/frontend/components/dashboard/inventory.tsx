@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Search,
   Filter,
@@ -68,149 +68,112 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts"
-
-// Sample inventory data
-const inventoryItems = [
-  {
-    id: "SKU-4521",
-    name: "Audifonos Inalambricos Pro",
-    category: "Electronica",
-    stock: 12,
-    reserved: 5,
-    threshold: 50,
-    price: 79.99,
-    cost: 35.00,
-    warehouse: "Almacen LA",
-    status: "low",
-    lastUpdated: "2024-01-15T10:30:00",
-  },
-  {
-    id: "SKU-3892",
-    name: "Cable de Carga USB-C 1.8m",
-    category: "Accesorios",
-    stock: 28,
-    reserved: 12,
-    threshold: 100,
-    price: 14.99,
-    cost: 4.50,
-    warehouse: "CD Chicago",
-    status: "low",
-    lastUpdated: "2024-01-15T09:15:00",
-  },
-  {
-    id: "SKU-2156",
-    name: "Funda de Telefono Premium",
-    category: "Accesorios",
-    stock: 8,
-    reserved: 3,
-    threshold: 30,
-    price: 29.99,
-    cost: 8.00,
-    warehouse: "Almacen LA",
-    status: "critical",
-    lastUpdated: "2024-01-15T08:45:00",
-  },
-  {
-    id: "SKU-7823",
-    name: "Altavoz Bluetooth Mini",
-    category: "Electronica",
-    stock: 156,
-    reserved: 24,
-    threshold: 50,
-    price: 49.99,
-    cost: 22.00,
-    warehouse: "Hub Miami",
-    status: "healthy",
-    lastUpdated: "2024-01-14T16:20:00",
-  },
-  {
-    id: "SKU-9012",
-    name: "Correa para Smartwatch",
-    category: "Wearables",
-    stock: 89,
-    reserved: 15,
-    threshold: 40,
-    price: 24.99,
-    cost: 7.50,
-    warehouse: "Centro Seattle",
-    status: "healthy",
-    lastUpdated: "2024-01-14T14:55:00",
-  },
-  {
-    id: "SKU-5634",
-    name: "Soporte de Laptop Aluminio",
-    category: "Oficina",
-    stock: 0,
-    reserved: 0,
-    threshold: 25,
-    price: 69.99,
-    cost: 28.00,
-    warehouse: "Almacen LA",
-    status: "out",
-    lastUpdated: "2024-01-14T12:30:00",
-  },
-  {
-    id: "SKU-1278",
-    name: "Camara Web HD 1080p",
-    category: "Electronica",
-    stock: 234,
-    reserved: 45,
-    threshold: 75,
-    price: 89.99,
-    cost: 42.00,
-    warehouse: "CD Chicago",
-    status: "healthy",
-    lastUpdated: "2024-01-14T10:00:00",
-  },
-  {
-    id: "SKU-8456",
-    name: "Set Organizador de Escritorio",
-    category: "Oficina",
-    stock: 67,
-    reserved: 8,
-    threshold: 30,
-    price: 34.99,
-    cost: 12.00,
-    warehouse: "Hub Miami",
-    status: "healthy",
-    lastUpdated: "2024-01-13T18:45:00",
-  },
-]
+import { useAuth } from "@/lib/auth-context"
 
 const stockHistoryData = [
-  { date: "Mon", stock: 1250 },
-  { date: "Tue", stock: 1180 },
-  { date: "Wed", stock: 1320 },
-  { date: "Thu", stock: 1290 },
-  { date: "Fri", stock: 1150 },
-  { date: "Sat", stock: 1080 },
-  { date: "Sun", stock: 1200 },
+  { date: "Lun", stock: 1250 },
+  { date: "Mar", stock: 1180 },
+  { date: "Mie", stock: 1320 },
+  { date: "Jue", stock: 1290 },
+  { date: "Vie", stock: 1150 },
+  { date: "Sab", stock: 1080 },
+  { date: "Dom", stock: 1200 },
 ]
 
-const statusConfig = {
-  healthy: { label: "Saludable", className: "bg-success/10 text-success" },
-  low: { label: "Stock Bajo", className: "bg-warning/10 text-warning" },
-  critical: { label: "Critico", className: "bg-destructive/10 text-destructive" },
-  out: { label: "Sin Stock", className: "bg-muted text-muted-foreground" },
+// Mapeo de estado real basado en stockBajo del backend
+const getStatusConfig = (stockBajo: boolean, cantidadEnStock: number) => {
+  if (cantidadEnStock === 0) return { label: "Sin Stock",   className: "bg-muted text-muted-foreground",          key: "out" }
+  if (stockBajo)             return { label: "Stock Bajo",  className: "bg-warning/10 text-warning",              key: "low" }
+  return                            { label: "Saludable",   className: "bg-success/10 text-success",              key: "healthy" }
 }
 
-type InventoryStatus = keyof typeof statusConfig
+interface Producto {
+  id: number
+  sku: string
+  nombre: string
+  descripcion: string
+  categoria: string
+  cantidadEnStock: number
+  stockMinimo: number
+  precio: number
+  almacen: string
+  stockBajo: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+interface NuevoProducto {
+  sku: string
+  nombre: string
+  descripcion: string
+  categoria: string
+  cantidadEnStock: number
+  stockMinimo: number
+  precio: number
+  almacen: string
+}
 
 export function InventoryPage() {
+  const { token } = useAuth()
+  const [inventoryItems, setInventoryItems] = useState<Producto[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [addItemOpen, setAddItemOpen] = useState(false)
+  const [nuevoProducto, setNuevoProducto] = useState<NuevoProducto>({
+    sku: "", nombre: "", descripcion: "", categoria: "",
+    cantidadEnStock: 0, stockMinimo: 0, precio: 0, almacen: ""
+  })
 
-  const categories = [...new Set(inventoryItems.map((item) => item.category))]
+  const fetchInventory = () => {
+    if (!token) return
+    fetch('http://localhost:8080/api/inventario', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setInventoryItems(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchInventory()
+  }, [token])
+
+  const handleAgregarProducto = async () => {
+    if (!token) return
+    try {
+      const res = await fetch('http://localhost:8080/api/inventario', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nuevoProducto),
+      })
+      if (res.ok) {
+        setAddItemOpen(false)
+        setNuevoProducto({ sku: "", nombre: "", descripcion: "", categoria: "", cantidadEnStock: 0, stockMinimo: 0, precio: 0, almacen: "" })
+        fetchInventory()
+      }
+    } catch (err) {
+      console.error('Error al agregar producto:', err)
+    }
+  }
+
+  const categories = [...new Set(inventoryItems.map((item) => item.categoria))]
 
   const filteredItems = inventoryItems.filter((item) => {
+    const status = getStatusConfig(item.stockBajo, item.cantidadEnStock)
     const matchesSearch =
-      item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || item.status === statusFilter
-    const matchesCategory = categoryFilter === "all" || item.category === categoryFilter
+      item.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.nombre.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus = statusFilter === "all" || status.key === statusFilter
+    const matchesCategory = categoryFilter === "all" || item.categoria === categoryFilter
     return matchesSearch && matchesStatus && matchesCategory
   })
 
@@ -224,14 +187,14 @@ export function InventoryPage() {
     if (selectedItems.length === filteredItems.length) {
       setSelectedItems([])
     } else {
-      setSelectedItems(filteredItems.map((item) => item.id))
+      setSelectedItems(filteredItems.map((item) => String(item.id)))
     }
   }
 
-  const totalValue = inventoryItems.reduce((sum, item) => sum + item.stock * item.price, 0)
-  const totalItems = inventoryItems.reduce((sum, item) => sum + item.stock, 0)
-  const lowStockCount = inventoryItems.filter((item) => item.status === "low" || item.status === "critical").length
-  const outOfStockCount = inventoryItems.filter((item) => item.status === "out").length
+  const totalValue = inventoryItems.reduce((sum, item) => sum + item.cantidadEnStock * item.precio, 0)
+  const totalItems = inventoryItems.reduce((sum, item) => sum + item.cantidadEnStock, 0)
+  const lowStockCount = inventoryItems.filter((item) => item.stockBajo && item.cantidadEnStock > 0).length
+  const outOfStockCount = inventoryItems.filter((item) => item.cantidadEnStock === 0).length
 
   return (
     <div className="space-y-6">
@@ -246,78 +209,88 @@ export function InventoryPage() {
             <Download className="h-4 w-4" />
             Exportar
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={fetchInventory}>
             <RefreshCcw className="h-4 w-4" />
             Sincronizar
           </Button>
-           <Dialog open={addItemOpen} onOpenChange={setAddItemOpen}>
+          <Dialog open={addItemOpen} onOpenChange={setAddItemOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Agregar Articulo
+                Agregar Artículo
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Agregar Articulo al Inventario</DialogTitle>
+                <DialogTitle>Agregar Artículo al Inventario</DialogTitle>
                 <DialogDescription>Agrega un nuevo producto a tu inventario.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="sku">SKU</Label>
-                  <Input id="sku" placeholder="SKU-XXXX" />
+                  <Label>SKU</Label>
+                  <Input placeholder="SKU-XXXX" value={nuevoProducto.sku}
+                    onChange={e => setNuevoProducto(p => ({ ...p, sku: e.target.value }))} />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Nombre del Producto</Label>
-                  <Input id="name" placeholder="Ingresa el nombre del producto" />
+                  <Label>Nombre del Producto</Label>
+                  <Input placeholder="Nombre del producto" value={nuevoProducto.nombre}
+                    onChange={e => setNuevoProducto(p => ({ ...p, nombre: e.target.value }))} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Descripción</Label>
+                  <Input placeholder="Descripción del producto" value={nuevoProducto.descripcion}
+                    onChange={e => setNuevoProducto(p => ({ ...p, descripcion: e.target.value }))} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Categoria</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
+                    <Label>Categoría</Label>
+                    <Select onValueChange={val => setNuevoProducto(p => ({ ...p, categoria: val }))}>
+                      <SelectTrigger><SelectValue placeholder="Selecciona categoría" /></SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
+                        <SelectItem value="ELECTRONICA">Electrónica</SelectItem>
+                        <SelectItem value="ROPA">Ropa</SelectItem>
+                        <SelectItem value="ALIMENTOS">Alimentos</SelectItem>
+                        <SelectItem value="HOGAR">Hogar</SelectItem>
+                        <SelectItem value="DEPORTES">Deportes</SelectItem>
+                        <SelectItem value="JUGUETES">Juguetes</SelectItem>
+                        <SelectItem value="OTROS">Otros</SelectItem>
                       </SelectContent>
                     </Select>
-                 </div>
+                  </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="warehouse">Almacen</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona almacen" />
-                      </SelectTrigger>
+                    <Label>Almacén</Label>
+                    <Select onValueChange={val => setNuevoProducto(p => ({ ...p, almacen: val }))}>
+                      <SelectTrigger><SelectValue placeholder="Selecciona almacén" /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Providencia">Almacen Providencia</SelectItem>
-                        <SelectItem value="Las condes">Almacen Las condes</SelectItem>
-                        <SelectItem value="Quinta normal">Almacen Quinta normal</SelectItem>
-                        <SelectItem value="S. centro">Almacen S. centro</SelectItem>
+                        <SelectItem value="Bodega Principal">Bodega Principal</SelectItem>
+                        <SelectItem value="Bodega Norte">Bodega Norte</SelectItem>
+                        <SelectItem value="Bodega Sur">Bodega Sur</SelectItem>
+                        <SelectItem value="Bodega Centro">Bodega Centro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="stock">Stock Inicial</Label>
-                    <Input id="stock" type="number" placeholder="0" />
+                    <Label>Stock Inicial</Label>
+                    <Input type="number" placeholder="0"
+                      onChange={e => setNuevoProducto(p => ({ ...p, cantidadEnStock: Number(e.target.value) }))} />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="price">Precio</Label>
-                    <Input id="price" type="number" placeholder="0.00" />
+                    <Label>Precio</Label>
+                    <Input type="number" placeholder="0.00"
+                      onChange={e => setNuevoProducto(p => ({ ...p, precio: Number(e.target.value) }))} />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="threshold">Alerta de Stock Bajo</Label>
-                    <Input id="threshold" type="number" placeholder="50" />
+                    <Label>Stock Mínimo</Label>
+                    <Input type="number" placeholder="10"
+                      onChange={e => setNuevoProducto(p => ({ ...p, stockMinimo: Number(e.target.value) }))} />
                   </div>
                 </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setAddItemOpen(false)}>Cancelar</Button>
-                <Button onClick={() => setAddItemOpen(false)}>Agregar Articulo</Button>
+                <Button onClick={handleAgregarProducto}>Agregar Artículo</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -335,12 +308,11 @@ export function InventoryPage() {
               <TrendingUp className="h-4 w-4 text-success" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Articulos Totales</p>
+              <p className="text-sm text-muted-foreground">Artículos Totales</p>
               <p className="text-2xl font-bold text-foreground">{totalItems.toLocaleString()}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-card border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -355,7 +327,6 @@ export function InventoryPage() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-card border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -365,12 +336,11 @@ export function InventoryPage() {
               <TrendingDown className="h-4 w-4 text-warning" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Articulos con Bajo Stock</p>
+              <p className="text-sm text-muted-foreground">Stock Bajo</p>
               <p className="text-2xl font-bold text-foreground">{lowStockCount}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-card border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -405,56 +375,38 @@ export function InventoryPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.25 0.02 250)" />
                 <XAxis dataKey="date" stroke="oklch(0.65 0 0)" fontSize={12} />
                 <YAxis stroke="oklch(0.65 0 0)" fontSize={12} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "oklch(0.16 0.02 250)",
-                    border: "1px solid oklch(0.25 0.02 250)",
-                    borderRadius: "8px",
-                    color: "oklch(0.95 0 0)",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="stock"
-                  stroke="oklch(0.68 0.18 45)"
-                  strokeWidth={2}
-                  fill="url(#stockGradient)"
-                />
+                <Tooltip contentStyle={{ backgroundColor: "oklch(0.16 0.02 250)", border: "1px solid oklch(0.25 0.02 250)", borderRadius: "8px", color: "oklch(0.95 0 0)" }} />
+                <Area type="monotone" dataKey="stock" stroke="oklch(0.68 0.18 45)" strokeWidth={2} fill="url(#stockGradient)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-1 items-center gap-4">
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search inventory..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-secondary border-0"
-                />
+                <Input placeholder="Buscar inventario..." value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 bg-secondary border-0" />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-40 bg-secondary border-0">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos los Estados</SelectItem>
                   <SelectItem value="healthy">Saludable</SelectItem>
                   <SelectItem value="low">Stock Bajo</SelectItem>
-                  <SelectItem value="critical">Critico</SelectItem>
                   <SelectItem value="out">Sin Stock</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-40 bg-secondary border-0">
-                  <SelectValue placeholder="Category" />
+                  <SelectValue placeholder="Categoría" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas las Categorías</SelectItem>
@@ -463,18 +415,12 @@ export function InventoryPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4" />
-              </Button>
+              <Button variant="outline" size="icon"><Filter className="h-4 w-4" /></Button>
             </div>
             {selectedItems.length > 0 && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {selectedItems.length} seleccionados
-                </span>
-                <Button variant="outline" size="sm">
-                  Actualizar en Lote
-                </Button>
+                <span className="text-sm text-muted-foreground">{selectedItems.length} seleccionados</span>
+                <Button variant="outline" size="sm">Actualizar en Lote</Button>
               </div>
             )}
           </div>
@@ -484,127 +430,115 @@ export function InventoryPage() {
       {/* Inventory Table */}
       <Card className="bg-card border-border">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-border hover:bg-transparent">
-                <TableHead className="w-12">
-                  <Checkbox
-                    checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
-                    onCheckedChange={toggleAllItems}
-                  />
-                </TableHead>
-                <TableHead>
-                  <Button variant="ghost" className="h-8 gap-1 -ml-3 font-medium">
-                    Producto <ArrowUpDown className="h-3 w-3" />
-                  </Button>
-                </TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Almacen</TableHead>
-                <TableHead className="text-right">Stock</TableHead>
-                <TableHead className="text-right">Reservado</TableHead>
-                <TableHead className="text-right">Disponible</TableHead>
-                <TableHead className="text-right">Precio</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map((item) => {
-                const status = statusConfig[item.status as InventoryStatus]
-                const available = item.stock - item.reserved
-                const stockPercentage = (item.stock / item.threshold) * 100
-                return (
-                  <TableRow key={item.id} className="border-border">
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedItems.includes(item.id)}
-                        onCheckedChange={() => toggleItemSelection(item.id)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center">
-                          <Package className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{item.name}</p>
-                          <p className="text-xs text-muted-foreground">{item.id}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="bg-secondary">
-                        {item.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">{item.warehouse}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="space-y-1">
-                        <p className="font-medium">{item.stock}</p>
-                        <Progress 
-                          value={Math.min(stockPercentage, 100)} 
-                          className="h-1 w-16 ml-auto"
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <p className="text-muted-foreground">Cargando inventario...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <p className="text-muted-foreground">No hay productos registrados.</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
+                      onCheckedChange={toggleAllItems}
+                    />
+                  </TableHead>
+                  <TableHead>
+                    <Button variant="ghost" className="h-8 gap-1 -ml-3 font-medium">
+                      Producto <ArrowUpDown className="h-3 w-3" />
+                    </Button>
+                  </TableHead>
+                  <TableHead>Categoría</TableHead>
+                  <TableHead>Almacén</TableHead>
+                  <TableHead className="text-right">Stock</TableHead>
+                  <TableHead className="text-right">Mínimo</TableHead>
+                  <TableHead className="text-right">Precio</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead className="w-12"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map((item) => {
+                  const status = getStatusConfig(item.stockBajo, item.cantidadEnStock)
+                  const stockPercentage = item.stockMinimo > 0
+                    ? (item.cantidadEnStock / item.stockMinimo) * 100
+                    : 100
+                  return (
+                    <TableRow key={item.id} className="border-border">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedItems.includes(String(item.id))}
+                          onCheckedChange={() => toggleItemSelection(String(item.id))}
                         />
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right text-muted-foreground">{item.reserved}</TableCell>
-                    <TableCell className="text-right font-medium">{available}</TableCell>
-                    <TableCell className="text-right font-medium">${item.price.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={status.className}>
-                        {status.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Editar Articulo
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <RefreshCcw className="mr-2 h-4 w-4" />
-                            Ajustar Stock
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Eliminar Articulo
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-
-          {/* Pagination */}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center">
+                            <Package className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{item.nombre}</p>
+                            <p className="text-xs text-muted-foreground">{item.sku}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="bg-secondary">{item.categoria}</Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{item.almacen}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="space-y-1">
+                          <p className="font-medium">{item.cantidadEnStock}</p>
+                          <Progress value={Math.min(stockPercentage, 100)} className="h-1 w-16 ml-auto" />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right text-muted-foreground">{item.stockMinimo}</TableCell>
+                      <TableCell className="text-right font-medium">${item.precio.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className={status.className}>{status.label}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              <Edit className="mr-2 h-4 w-4" />Editar Artículo
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <RefreshCcw className="mr-2 h-4 w-4" />Ajustar Stock
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="mr-2 h-4 w-4" />Eliminar Artículo
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          )}
           <div className="flex items-center justify-between border-t border-border px-4 py-3">
             <p className="text-sm text-muted-foreground">
               Mostrando {filteredItems.length} de {inventoryItems.length} artículos
             </p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" className="h-8 w-8">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 min-w-8">
-                1
-              </Button>
-              <Button variant="ghost" size="sm" className="h-8 min-w-8">
-                2
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <Button variant="outline" size="icon" className="h-8 w-8"><ChevronLeft className="h-4 w-4" /></Button>
+              <Button variant="outline" size="sm" className="h-8 min-w-8">1</Button>
+              <Button variant="outline" size="icon" className="h-8 w-8"><ChevronRight className="h-4 w-4" /></Button>
             </div>
           </div>
         </CardContent>
