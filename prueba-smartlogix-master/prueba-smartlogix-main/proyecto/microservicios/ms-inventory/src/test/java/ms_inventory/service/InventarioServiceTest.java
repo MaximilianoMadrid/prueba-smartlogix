@@ -33,7 +33,7 @@ class InventarioServiceTest {
         request.setSku("SKU-123");
         request.setNombre("Lapicera");
         request.setDescripcion("Lapicera azul");
-        request.setCategoria(CategoriaProducto.UTILES);
+        request.setCategoria(CategoriaProducto.OTROS);
         request.setCantidadEnStock(50);
         request.setStockMinimo(10);
         request.setPrecio(1.5);
@@ -47,7 +47,7 @@ class InventarioServiceTest {
                 .sku("SKU-123")
                 .nombre("Lapicera")
                 .descripcion("Lapicera azul")
-                .categoria(CategoriaProducto.UTILES)
+                .categoria(CategoriaProducto.OTROS)
                 .cantidadEnStock(50)
                 .stockMinimo(10)
                 .precio(1.5)
