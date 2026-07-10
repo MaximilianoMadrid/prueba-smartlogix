@@ -89,13 +89,14 @@ Servicio encargado de la autenticación y autorización de usuarios mediante JWT
 
 ```bash
 http://localhost:8081/swagger-ui.html
----
+```
 
 ### Pruebas unitarias
 
 Cuenta con pruebas unitarias de la capa de servicio (`AuthServiceTest`) usando JUnit 5 y Mockito, validando el registro de usuarios y la encriptación de contraseñas antes de persistir.
 
 ---
+
 ## ms-orders
 
 Servicio encargado de la administración de pedidos.
@@ -114,11 +115,13 @@ Servicio encargado de la administración de pedidos.
 ```bash
 8082
 ```
+
 ### Documentación API (Swagger)
 
 ```bash
 http://localhost:8082/swagger-ui.html
 ```
+
 ### Pruebas unitarias
 
 Es el microservicio con mayor cobertura de pruebas del proyecto:
@@ -149,11 +152,21 @@ microservicios/ms-orders/target/site/jacoco/index.html
 
 Servicio encargado del control y gestión de inventario.
 
-### Posibles funcionalidades
+### Funcionalidades
 
 * Registro de productos
 * Control de stock
 * Actualización de inventario
+
+### Pruebas unitarias agregadas
+
+* `InventarioServiceTest`: valida agregar producto, evitar SKU duplicado, actualizar stock y eliminar productos.
+
+Para ejecutar estas pruebas:
+
+```bash
+mvn -f proyecto/microservicios/ms-inventory/pom.xml -Dtest=InventarioServiceTest test
+```
 
 ---
 
@@ -161,11 +174,23 @@ Servicio encargado del control y gestión de inventario.
 
 Servicio encargado de la gestión de envíos.
 
-### Posibles funcionalidades
+### Funcionalidades
 
 * Gestión de despachos
 * Estados de envío
 * Información logística
+
+### Pruebas unitarias agregadas
+
+* `EnvioServiceTest`: valida crear envío, detectar seguimiento duplicado, obtener y actualizar estados, eliminar envíos.
+
+Además se ajustó el test de contexto `MsShippingApplicationTests` para cargar explícitamente `MsShippingApplication.class`.
+
+Para ejecutar estas pruebas:
+
+```bash
+mvn -f proyecto/microservicios/ms-shipping/pom.xml -Dtest=EnvioServiceTest test
+```
 
 ---
 
@@ -173,11 +198,23 @@ Servicio encargado de la gestión de envíos.
 
 Servicio orientado al seguimiento de pedidos y envíos.
 
-### Posibles funcionalidades
+### Funcionalidades
 
 * Tracking en tiempo real
 * Historial de estados
 * Seguimiento logístico
+
+### Pruebas unitarias agregadas
+
+* `TrackingServiceTest`: valida registrar eventos, obtener historial, buscar por envío, obtener por id y eliminar eventos.
+
+Además se ajustó el test de contexto `MsTrackingApplicationTests` para cargar explícitamente `MsTrackingApplication.class`.
+
+Para ejecutar estas pruebas:
+
+```bash
+mvn -f proyecto/microservicios/ms-tracking/pom.xml -Dtest=TrackingServiceTest test
+```
 
 ---
 
@@ -185,11 +222,23 @@ Servicio orientado al seguimiento de pedidos y envíos.
 
 Servicio encargado de las notificaciones del sistema.
 
-### Posibles funcionalidades
+### Funcionalidades
 
 * Envío de alertas
 * Notificaciones de pedidos
 * Confirmaciones de estado
+
+### Pruebas unitarias agregadas
+
+* `NotificacionServiceTest`: valida crear notificaciones, contar no leídas, marcar como leída, marcar todas como leídas y eliminar notificaciones.
+
+Además se ajustó el test de contexto `MsNotificationApplicationTests` para cargar explícitamente `MsNotificationApplication.class`.
+
+Para ejecutar estas pruebas:
+
+```bash
+mvn -f proyecto/microservicios/ms-notification/pom.xml -Dtest=NotificacionServiceTest test
+```
 
 ---
 
@@ -256,96 +305,49 @@ Instalar:
 * PostgreSQL
 * Docker Desktop
 
----
-
-# Clonar el repositorio
+## Ejecutar desde Docker Compose
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
 cd proyecto
+docker compose up --build
+```
+
+## Ejecutar pruebas unitarias del backend
+
+```bash
+mvn -f proyecto/microservicios/ms-inventory/pom.xml -Dtest=InventarioServiceTest test
+mvn -f proyecto/microservicios/ms-shipping/pom.xml -Dtest=EnvioServiceTest test
+mvn -f proyecto/microservicios/ms-tracking/pom.xml -Dtest=TrackingServiceTest test
+mvn -f proyecto/microservicios/ms-notification/pom.xml -Dtest=NotificacionServiceTest test
+```
+
+## Ejecutar todos los tests de un módulo
+
+```bash
+mvn -f proyecto/microservicios/ms-shipping/pom.xml test
+```
+
+## Generar reporte JaCoCo
+
+Si el plugin JaCoCo está configurado en el `pom.xml`:
+
+```bash
+mvn -f proyecto/microservicios/ms-orders/pom.xml test jacoco:report
+```
+
+El informe HTML queda en:
+
+```bash
+microservicios/ms-orders/target/site/jacoco/index.html
 ```
 
 ---
 
-# Ejecutar el Frontend
+# Notas
 
-```bash
-cd frontend
-npm install
-npm run dev
-en caso de no funcionar usar:
-(npx pnpm install)
-(npx pnpm run dev)
-```
-
-El frontend estará disponible en:
-
-```bash
-http://localhost:3000
-```
-
----
-
-# Ejecutar Microservicios
-
-Ejemplo para ms-auth:
-
-```bash
-cd microservicios/ms-auth
-mvn spring-boot:run
-```
-
-Ejemplo para ms-orders:
-
-```bash
-cd microservicios/ms-orders
-mvn spring-boot:run
-```
-
----
-
-# Docker
-
-El proyecto incluye archivos Dockerfile para los microservicios y frontend.
-
-Ejemplo de construcción:
-
-```bash
-docker build -t ms-auth .
-```
-
-Ejemplo de ejecución:
-
-```bash
-docker run -p 8081:8081 ms-auth
-```
-
----
-
-# API Gateway
-
-El proyecto incluye un módulo `api-gateway` pensado para centralizar el acceso a los microservicios.
-
-### Objetivos del Gateway
-
-* Enrutamiento centralizado
-* Seguridad
-* Balanceo de carga
-* Gestión de peticiones
-
----
-
-# Seguridad
-
-El sistema utiliza JWT para autenticación.
-
-Configuración observada:
-
-```yaml
-jwt:
-  secret: smartlogix-clave-super-secreta
-  expiration: 86400000
-```
+* Los tests añadidos son unitarios y cubren la lógica de servicio de los microservicios.
+* Los tests de contexto (`@SpringBootTest`) se ajustaron para cargar explícitamente la clase principal de cada microservicio.
+* Para validar Swagger/OpenAPI automáticamente, se puede agregar un test de integración que solicite `/v3/api-docs`.
 
 # Pruebas Unitarias y Cobertura
  

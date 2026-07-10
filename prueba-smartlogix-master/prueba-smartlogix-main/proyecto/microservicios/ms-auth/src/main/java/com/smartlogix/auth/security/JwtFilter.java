@@ -40,17 +40,25 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String email = jwtService.extractEmail(token);
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            userRepository.findByEmail(email).ifPresent(user -> {
-                if (jwtService.isTokenValid(token, user.getEmail())) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(user, null, List.of());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            });
+        try {
+            String email = jwtService.extractEmail(token);
+
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                userRepository.findByEmail(email).ifPresent(user -> {
+                    if (jwtService.isTokenValid(token, user.getEmail())) {
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(user, null, List.of());
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            // Token malformado, expirado o con firma inválida: no autenticamos
+            // y devolvemos 401 en vez de dejar que la excepción se propague como 500.
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+            return;
         }
 
         filterChain.doFilter(request, response);

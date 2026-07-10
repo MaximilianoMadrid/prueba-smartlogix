@@ -1,0 +1,297 @@
+
+
+services:
+
+  # ─── BASES DE DATOS ──────────────────────────────────────
+
+  postgres-auth:
+    image: postgres:15-alpine
+    container_name: smartlogix-postgres-auth
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+    networks:
+      - smartlogix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-orders:
+    image: postgres:15-alpine
+    container_name: smartlogix-postgres-orders
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_orders_data:/var/lib/postgresql/data
+    networks:
+      - smartlogix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d orders_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-inventory:
+    image: postgres:15-alpine
+    container_name: smartlogix-postgres-inventory
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_inventory_data:/var/lib/postgresql/data
+    networks:
+      - smartlogix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d inventory_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-shipping:
+    image: postgres:15-alpine
+    container_name: smartlogix-postgres-shipping
+    environment:
+      POSTGRES_DB: shipping_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_shipping_data:/var/lib/postgresql/data
+    networks:
+      - smartlogix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shipping_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-tracking:
+    image: postgres:15-alpine
+    container_name: smartlogix-postgres-tracking
+    environment:
+      POSTGRES_DB: tracking_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_tracking_data:/var/lib/postgresql/data
+    networks:
+      - smartlogix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tracking_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-notification:
+    image: postgres:15-alpine
+    container_name: smartlogix-postgres-notification
+    environment:
+      POSTGRES_DB: notification_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "1234"
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres_notification_data:/var/lib/postgresql/data
+    networks:
+      - smartlogix-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d notification_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── MICROSERVICIOS ──────────────────────────────────────
+
+  ms-auth:
+    build:
+      context: ./microservicios/ms-auth
+      dockerfile: Dockerfile
+    container_name: smartlogix-ms-auth
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      JWT_SECRET: smartlogix-clave-super-secreta-2024-cambiar-en-produccion
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  ms-orders:
+    build:
+      context: ./microservicios/ms-orders
+      dockerfile: Dockerfile
+    container_name: smartlogix-ms-orders
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-orders:5432/orders_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      JWT_SECRET: smartlogix-clave-super-secreta-2024-cambiar-en-produccion
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres-orders:
+        condition: service_healthy
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  ms-inventory:
+    build:
+      context: ./microservicios/ms-inventory
+      dockerfile: Dockerfile
+    container_name: smartlogix-ms-inventory
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-inventory:5432/inventory_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      JWT_SECRET: smartlogix-clave-super-secreta-2024-cambiar-en-produccion
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres-inventory:
+        condition: service_healthy
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  ms-shipping:
+    build:
+      context: ./microservicios/ms-shipping
+      dockerfile: Dockerfile
+    container_name: smartlogix-ms-shipping
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-shipping:5432/shipping_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      JWT_SECRET: smartlogix-clave-super-secreta-2024-cambiar-en-produccion
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres-shipping:
+        condition: service_healthy
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  ms-tracking:
+    build:
+      context: ./microservicios/ms-tracking
+      dockerfile: Dockerfile
+    container_name: smartlogix-ms-tracking
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-tracking:5432/tracking_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      JWT_SECRET: smartlogix-clave-super-secreta-2024-cambiar-en-produccion
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres-tracking:
+        condition: service_healthy
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  ms-notification:
+    build:
+      context: ./microservicios/ms-notification
+      dockerfile: Dockerfile
+    container_name: smartlogix-ms-notification
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-notification:5432/notification_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "1234"
+      JWT_SECRET: smartlogix-clave-super-secreta-2024-cambiar-en-produccion
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres-notification:
+        condition: service_healthy
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  # ─── API GATEWAY ─────────────────────────────────────────
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: smartlogix-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      MS_AUTH_URI: http://ms-auth:8081
+      MS_ORDERS_URI: http://ms-orders:8082
+      MS_INVENTORY_URI: http://ms-inventory:8083
+      MS_SHIPPING_URI: http://ms-shipping:8084
+      MS_TRACKING_URI: http://ms-tracking:8085
+      MS_NOTIFICATION_URI: http://ms-notification:8086
+    depends_on:
+      - ms-auth
+      - ms-orders
+      - ms-inventory
+      - ms-shipping
+      - ms-tracking
+      - ms-notification
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+  # ─── FRONTEND ────────────────────────────────────────────
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smartlogix-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - smartlogix-network
+    restart: on-failure
+
+# ─── REDES Y VOLÚMENES ───────────────────────────────────
+
+networks:
+  smartlogix-network:
+    driver: bridge
+
+volumes:
+  postgres_auth_data:
+  postgres_orders_data:
+  postgres_inventory_data:
+  postgres_shipping_data:
+  postgres_tracking_data:
+  postgres_notification_data:

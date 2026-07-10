@@ -6,15 +6,10 @@ import {
   Building2,
   Bell,
   Shield,
-  CreditCard,
   Plug,
-  Webhook,
   Key,
-  Globe,
-  Mail,
   Save,
   Check,
-  ExternalLink,
   Plus,
   Settings,
   Trash2,
@@ -44,225 +39,123 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
+import { useAuth } from "@/lib/auth-context"
 
-// Sample integrations data
 const integrations = [
-  {
-    id: "shopify",
-    name: "Shopify",
-    description: "Sync orders and inventory with your Shopify store",
-    category: "eCommerce",
-    connected: true,
-    lastSync: "2024-01-15T10:30:00",
-  },
-  {
-    id: "amazon",
-    name: "Amazon",
-    description: "Connect your Amazon Seller account",
-    category: "Marketplace",
-    connected: true,
-    lastSync: "2024-01-15T09:15:00",
-  },
-  {
-    id: "woocommerce",
-    name: "WooCommerce",
-    description: "Integrate with your WooCommerce store",
-    category: "eCommerce",
-    connected: false,
-    lastSync: null,
-  },
-  {
-    id: "fedex",
-    name: "FedEx",
-    description: "Ship with FedEx and track packages",
-    category: "Carrier",
-    connected: true,
-    lastSync: "2024-01-15T11:00:00",
-  },
-  {
-    id: "ups",
-    name: "UPS",
-    description: "UPS shipping integration",
-    category: "Carrier",
-    connected: true,
-    lastSync: "2024-01-15T10:45:00",
-  },
-  {
-    id: "dhl",
-    name: "DHL",
-    description: "International shipping with DHL",
-    category: "Carrier",
-    connected: false,
-    lastSync: null,
-  },
-  {
-    id: "stripe",
-    name: "Stripe",
-    description: "Process payments with Stripe",
-    category: "Payments",
-    connected: true,
-    lastSync: "2024-01-15T10:00:00",
-  },
-  {
-    id: "quickbooks",
-    name: "QuickBooks",
-    description: "Sync with QuickBooks accounting",
-    category: "Accounting",
-    connected: false,
-    lastSync: null,
-  },
-  {
-    id: "slack",
-    name: "Slack",
-    description: "Get notifications in Slack",
-    category: "Communication",
-    connected: true,
-    lastSync: "2024-01-15T08:30:00",
-  },
-  {
-    id: "zapier",
-    name: "Zapier",
-    description: "Connect with 5000+ apps via Zapier",
-    category: "Automation",
-    connected: false,
-    lastSync: null,
-  },
+  { id: "shopify",     name: "Shopify",     category: "eCommerce",      connected: true  },
+  { id: "amazon",      name: "Amazon",      category: "Marketplace",    connected: true  },
+  { id: "woocommerce", name: "WooCommerce", category: "eCommerce",      connected: false },
+  { id: "fedex",       name: "FedEx",       category: "Transportista",  connected: true  },
+  { id: "ups",         name: "UPS",         category: "Transportista",  connected: true  },
+  { id: "dhl",         name: "DHL",         category: "Transportista",  connected: false },
+  { id: "stripe",      name: "Stripe",      category: "Pagos",          connected: true  },
+  { id: "quickbooks",  name: "QuickBooks",  category: "Contabilidad",   connected: false },
+  { id: "slack",       name: "Slack",       category: "Comunicación",   connected: true  },
+  { id: "zapier",      name: "Zapier",      category: "Automatización", connected: false },
 ]
 
 const webhooks = [
-  {
-    id: "wh-001",
-    name: "Order Created",
-    url: "https://api.example.com/webhooks/orders",
-    events: ["order.created"],
-    active: true,
-  },
-  {
-    id: "wh-002",
-    name: "Shipment Updates",
-    url: "https://api.example.com/webhooks/shipments",
-    events: ["shipment.created", "shipment.delivered"],
-    active: true,
-  },
-  {
-    id: "wh-003",
-    name: "Inventory Alerts",
-    url: "https://api.example.com/webhooks/inventory",
-    events: ["inventory.low_stock"],
-    active: false,
-  },
+  { id: "wh-001", name: "Pedido Creado",        url: "https://api.example.com/webhooks/orders",    events: ["order.created"],                          active: true  },
+  { id: "wh-002", name: "Actualizaciones Envío", url: "https://api.example.com/webhooks/shipments", events: ["shipment.created", "shipment.delivered"],  active: true  },
+  { id: "wh-003", name: "Alertas Inventario",    url: "https://api.example.com/webhooks/inventory", events: ["inventory.low_stock"],                     active: false },
 ]
 
 const apiKeys = [
-  {
-    id: "key-001",
-    name: "Production API Key",
-    key: "sk_live_••••••••••••••••xxxx",
-    created: "2024-01-01",
-    lastUsed: "2024-01-15",
-  },
-  {
-    id: "key-002",
-    name: "Development API Key",
-    key: "sk_test_••••••••••••••••yyyy",
-    created: "2024-01-05",
-    lastUsed: "2024-01-14",
-  },
+  { id: "key-001", name: "Clave API Producción",  key: "sk_live_••••••••••••••••xxxx", created: "2024-01-01", lastUsed: "2024-01-15" },
+  { id: "key-002", name: "Clave API Desarrollo",  key: "sk_test_••••••••••••••••yyyy", created: "2024-01-05", lastUsed: "2024-01-14" },
 ]
 
+// Extrae el email del payload JWT sin librería externa
+function decodeEmailFromToken(token: string): string {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    return payload.sub ?? payload.email ?? ""
+  } catch {
+    return ""
+  }
+}
+
 export function SettingsPage() {
+  const { token, logout } = useAuth()
   const [activeTab, setActiveTab] = useState("profile")
   const [notifications, setNotifications] = useState({
-    orderAlerts: true,
-    shipmentUpdates: true,
-    inventoryAlerts: true,
-    weeklyReports: true,
-    marketingEmails: false,
+    orderAlerts:      true,
+    shipmentUpdates:  true,
+    inventoryAlerts:  true,
+    weeklyReports:    true,
+    marketingEmails:  false,
   })
+
+  // Email real del usuario logueado
+  const userEmail = token ? decodeEmailFromToken(token) : ""
+  const userInitials = userEmail ? userEmail.substring(0, 2).toUpperCase() : "US"
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground">Manage your account, integrations, and preferences.</p>
+        <h1 className="text-2xl font-bold text-foreground">Configuración</h1>
+        <p className="text-muted-foreground">Gestiona tu cuenta, integraciones y preferencias.</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 h-auto">
-          <TabsTrigger value="profile" className="gap-2">
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="company" className="gap-2">
-            <Building2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Company</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="integrations" className="gap-2">
-            <Plug className="h-4 w-4" />
-            <span className="hidden sm:inline">Integrations</span>
-          </TabsTrigger>
-          <TabsTrigger value="api" className="gap-2">
-            <Key className="h-4 w-4" />
-            <span className="hidden sm:inline">API</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
-          </TabsTrigger>
+          <TabsTrigger value="profile"       className="gap-2"><User       className="h-4 w-4" /><span className="hidden sm:inline">Perfil</span></TabsTrigger>
+          <TabsTrigger value="company"       className="gap-2"><Building2  className="h-4 w-4" /><span className="hidden sm:inline">Empresa</span></TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-2"><Bell       className="h-4 w-4" /><span className="hidden sm:inline">Notificaciones</span></TabsTrigger>
+          <TabsTrigger value="integrations"  className="gap-2"><Plug       className="h-4 w-4" /><span className="hidden sm:inline">Integraciones</span></TabsTrigger>
+          <TabsTrigger value="api"           className="gap-2"><Key        className="h-4 w-4" /><span className="hidden sm:inline">API</span></TabsTrigger>
+          <TabsTrigger value="security"      className="gap-2"><Shield     className="h-4 w-4" /><span className="hidden sm:inline">Seguridad</span></TabsTrigger>
         </TabsList>
 
-        {/* Profile Tab */}
+        {/* ── Perfil ─────────────────────────────────────────── */}
         <TabsContent value="profile" className="space-y-6">
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal information and preferences.</CardDescription>
+              <CardTitle>Información del Perfil</CardTitle>
+              <CardDescription>Actualiza tu información personal y preferencias.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center gap-6">
                 <Avatar className="h-20 w-20">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl">JD</AvatarFallback>
+                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                    {userInitials}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="space-y-2">
-                  <Button variant="outline">Change Avatar</Button>
-                  <p className="text-xs text-muted-foreground">JPG, PNG or GIF. Max 2MB.</p>
+                  <Button variant="outline">Cambiar Avatar</Button>
+                  <p className="text-xs text-muted-foreground">JPG, PNG o GIF. Máx. 2MB.</p>
                 </div>
               </div>
               <Separator />
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" defaultValue="John" />
+                  <Label htmlFor="firstName">Nombre</Label>
+                  <Input id="firstName" placeholder="Tu nombre" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" defaultValue="Doe" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="john.doe@company.com" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" />
+                  <Label htmlFor="lastName">Apellido</Label>
+                  <Input id="lastName" placeholder="Tu apellido" />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Select defaultValue="america-la">
+                  <Label htmlFor="email">Correo</Label>
+                  {/* Email real del usuario logueado */}
+                  <Input id="email" type="email" value={userEmail} readOnly className="bg-secondary" />
+                  <p className="text-xs text-muted-foreground">El correo se gestiona desde el sistema de autenticación.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Teléfono</Label>
+                  <Input id="phone" type="tel" placeholder="+56 9 XXXX XXXX" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="timezone">Zona Horaria</Label>
+                  <Select defaultValue="america">
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="america-la">America/Los_Angeles (PST)</SelectItem>
-                      <SelectItem value="america-ny">America/New_York (EST)</SelectItem>
-                      <SelectItem value="america-chicago">America/Chicago (CST)</SelectItem>
-                      <SelectItem value="europe-london">Europe/London (GMT)</SelectItem>
+                      <SelectItem value="america">Chile/Santiago (CLT)</SelectItem>
+                      <SelectItem value="argentina">Argentina (ART)</SelectItem>
+                      <SelectItem value="peru">Perú (PET)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -270,81 +163,75 @@ export function SettingsPage() {
               <div className="flex justify-end">
                 <Button className="gap-2">
                   <Save className="h-4 w-4" />
-                  Save Changes
+                  Guardar Cambios
                 </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Company Tab */}
+        {/* ── Empresa ────────────────────────────────────────── */}
         <TabsContent value="company" className="space-y-6">
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle>Company Information</CardTitle>
-              <CardDescription>Manage your company details and branding.</CardDescription>
+              <CardTitle>Información de la Empresa</CardTitle>
+              <CardDescription>Administra los detalles de tu empresa y su marca.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="companyName">Company Name</Label>
-                  <Input id="companyName" defaultValue="Acme eCommerce Inc." />
+                  <Label>Nombre de la Empresa</Label>
+                  <Input defaultValue="SmartLogix eCommerce" />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input id="address" defaultValue="123 Business St, Suite 100" />
+                  <Label>Dirección</Label>
+                  <Input defaultValue="Av. Providencia 1234" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" defaultValue="Los Angeles" />
+                  <Label>Ciudad</Label>
+                  <Input defaultValue="Providencia" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="state">State</Label>
-                  <Input id="state" defaultValue="California" />
+                  <Label>Región</Label>
+                  <Input defaultValue="Región Metropolitana" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="zip">ZIP Code</Label>
-                  <Input id="zip" defaultValue="90001" />
+                  <Label>Código Postal</Label>
+                  <Input defaultValue="7500000" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Select defaultValue="us">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
+                  <Label>País</Label>
+                  <Select defaultValue="cl">
+                    <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="us">United States</SelectItem>
-                      <SelectItem value="ca">Canada</SelectItem>
-                      <SelectItem value="uk">United Kingdom</SelectItem>
-                      <SelectItem value="au">Australia</SelectItem>
+                      <SelectItem value="cl">Chile</SelectItem>
+                      <SelectItem value="ar">Argentina</SelectItem>
+                      <SelectItem value="pe">Perú</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="flex justify-end">
-                <Button className="gap-2">
-                  <Save className="h-4 w-4" />
-                  Save Changes
-                </Button>
+                <Button className="gap-2"><Save className="h-4 w-4" />Guardar Cambios</Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Notifications Tab */}
+        {/* ── Notificaciones ─────────────────────────────────── */}
         <TabsContent value="notifications" className="space-y-6">
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Choose what notifications you want to receive.</CardDescription>
+              <CardTitle>Preferencias de Notificaciones</CardTitle>
+              <CardDescription>Elige qué notificaciones deseas recibir.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {[
-                { key: "orderAlerts", label: "Order Alerts", desc: "Get notified for new orders and updates" },
-                { key: "shipmentUpdates", label: "Shipment Updates", desc: "Track shipment status changes" },
-                { key: "inventoryAlerts", label: "Inventory Alerts", desc: "Low stock and out of stock warnings" },
-                { key: "weeklyReports", label: "Weekly Reports", desc: "Receive weekly performance summaries" },
-                { key: "marketingEmails", label: "Marketing Emails", desc: "Product updates and promotions" },
+                { key: "orderAlerts",      label: "Alertas de Pedidos",          desc: "Recibe avisos de nuevos pedidos y actualizaciones" },
+                { key: "shipmentUpdates",  label: "Actualizaciones de Envío",    desc: "Rastrea los cambios de estado de los envíos" },
+                { key: "inventoryAlerts",  label: "Alertas de Inventario",       desc: "Avisos de stock bajo y sin stock" },
+                { key: "weeklyReports",    label: "Reportes Semanales",          desc: "Recibe resúmenes semanales de rendimiento" },
+                { key: "marketingEmails",  label: "Correos de Marketing",        desc: "Novedades de productos y promociones" },
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -354,7 +241,7 @@ export function SettingsPage() {
                   <Switch
                     checked={notifications[item.key as keyof typeof notifications]}
                     onCheckedChange={(checked) =>
-                      setNotifications((prev) => ({ ...prev, [item.key]: checked }))
+                      setNotifications(prev => ({ ...prev, [item.key]: checked }))
                     }
                   />
                 </div>
@@ -363,22 +250,19 @@ export function SettingsPage() {
           </Card>
         </TabsContent>
 
-        {/* Integrations Tab */}
+        {/* ── Integraciones ──────────────────────────────────── */}
         <TabsContent value="integrations" className="space-y-6">
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle>Connected Integrations</CardTitle>
-              <CardDescription>Manage your third-party service connections.</CardDescription>
+              <CardTitle>Integraciones Conectadas</CardTitle>
+              <CardDescription>Gestiona tus conexiones con servicios de terceros.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2">
                 {integrations.map((integration) => (
-                  <div
-                    key={integration.id}
-                    className="flex items-center justify-between rounded-lg border border-border p-4 transition-colors hover:bg-secondary/50"
-                  >
+                  <div key={integration.id} className="flex items-center justify-between rounded-lg border border-border p-4 hover:bg-secondary/50 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary text-foreground font-bold">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary font-bold text-foreground">
                         {integration.name[0]}
                       </div>
                       <div>
@@ -390,17 +274,14 @@ export function SettingsPage() {
                       {integration.connected ? (
                         <>
                           <Badge variant="secondary" className="bg-success/10 text-success">
-                            <Check className="mr-1 h-3 w-3" />
-                            Connected
+                            <Check className="mr-1 h-3 w-3" />Conectado
                           </Badge>
                           <Button variant="ghost" size="sm">
                             <Settings className="h-4 w-4" />
                           </Button>
                         </>
                       ) : (
-                        <Button variant="outline" size="sm">
-                          Connect
-                        </Button>
+                        <Button variant="outline" size="sm">Conectar</Button>
                       )}
                     </div>
                   </div>
@@ -410,47 +291,41 @@ export function SettingsPage() {
           </Card>
         </TabsContent>
 
-        {/* API Tab */}
+        {/* ── API ────────────────────────────────────────────── */}
         <TabsContent value="api" className="space-y-6">
-          {/* API Keys */}
           <Card className="bg-card border-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>API Keys</CardTitle>
-                <CardDescription>Manage your API keys for programmatic access.</CardDescription>
+                <CardTitle>Claves API</CardTitle>
+                <CardDescription>Gestiona tus claves API para acceso programático.</CardDescription>
               </div>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Create Key
-                  </Button>
+                  <Button size="sm" className="gap-2"><Plus className="h-4 w-4" />Crear Clave</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create API Key</DialogTitle>
-                    <DialogDescription>Generate a new API key for your application.</DialogDescription>
+                    <DialogTitle>Crear Clave API</DialogTitle>
+                    <DialogDescription>Genera una nueva clave API para tu aplicación.</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="keyName">Key Name</Label>
-                      <Input id="keyName" placeholder="My API Key" />
+                      <Label>Nombre de la Clave</Label>
+                      <Input placeholder="Mi Clave API" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="keyEnv">Environment</Label>
+                      <Label>Entorno</Label>
                       <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select environment" />
-                        </SelectTrigger>
+                        <SelectTrigger><SelectValue placeholder="Selecciona entorno" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="production">Production</SelectItem>
-                          <SelectItem value="development">Development</SelectItem>
+                          <SelectItem value="production">Producción</SelectItem>
+                          <SelectItem value="development">Desarrollo</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button>Generate Key</Button>
+                    <Button>Generar Clave</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -458,15 +333,12 @@ export function SettingsPage() {
             <CardContent>
               <div className="space-y-4">
                 {apiKeys.map((apiKey) => (
-                  <div
-                    key={apiKey.id}
-                    className="flex items-center justify-between rounded-lg border border-border p-4"
-                  >
+                  <div key={apiKey.id} className="flex items-center justify-between rounded-lg border border-border p-4">
                     <div className="space-y-1">
                       <p className="font-medium text-foreground">{apiKey.name}</p>
                       <p className="font-mono text-sm text-muted-foreground">{apiKey.key}</p>
                       <p className="text-xs text-muted-foreground">
-                        Created {apiKey.created} • Last used {apiKey.lastUsed}
+                        Creada {apiKey.created} • Último uso {apiKey.lastUsed}
                       </p>
                     </div>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
@@ -478,37 +350,33 @@ export function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Webhooks */}
           <Card className="bg-card border-border">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Webhooks</CardTitle>
-                <CardDescription>Configure webhooks to receive real-time events.</CardDescription>
+                <CardDescription>Configura webhooks para recibir eventos en tiempo real.</CardDescription>
               </div>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="sm" className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Webhook
-                  </Button>
+                  <Button size="sm" className="gap-2"><Plus className="h-4 w-4" />Agregar Webhook</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Create Webhook</DialogTitle>
-                    <DialogDescription>Set up a new webhook endpoint.</DialogDescription>
+                    <DialogTitle>Crear Webhook</DialogTitle>
+                    <DialogDescription>Configura un nuevo endpoint de webhook.</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <Label htmlFor="webhookName">Name</Label>
-                      <Input id="webhookName" placeholder="My Webhook" />
+                      <Label>Nombre</Label>
+                      <Input placeholder="Mi Webhook" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="webhookUrl">URL</Label>
-                      <Input id="webhookUrl" placeholder="https://api.example.com/webhooks" />
+                      <Label>URL</Label>
+                      <Input placeholder="https://api.example.com/webhooks" />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button>Create Webhook</Button>
+                    <Button>Crear Webhook</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -516,23 +384,18 @@ export function SettingsPage() {
             <CardContent>
               <div className="space-y-4">
                 {webhooks.map((webhook) => (
-                  <div
-                    key={webhook.id}
-                    className="flex items-center justify-between rounded-lg border border-border p-4"
-                  >
+                  <div key={webhook.id} className="flex items-center justify-between rounded-lg border border-border p-4">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-foreground">{webhook.name}</p>
                         <Badge variant="secondary" className={webhook.active ? "bg-success/10 text-success" : "bg-muted"}>
-                          {webhook.active ? "Active" : "Inactive"}
+                          {webhook.active ? "Activo" : "Inactivo"}
                         </Badge>
                       </div>
                       <p className="font-mono text-sm text-muted-foreground">{webhook.url}</p>
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-wrap">
                         {webhook.events.map((event) => (
-                          <Badge key={event} variant="secondary" className="bg-secondary text-xs">
-                            {event}
-                          </Badge>
+                          <Badge key={event} variant="secondary" className="bg-secondary text-xs">{event}</Badge>
                         ))}
                       </div>
                     </div>
@@ -549,64 +412,68 @@ export function SettingsPage() {
           </Card>
         </TabsContent>
 
-        {/* Security Tab */}
+        {/* ── Seguridad ──────────────────────────────────────── */}
         <TabsContent value="security" className="space-y-6">
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle>Password</CardTitle>
-              <CardDescription>Update your password to keep your account secure.</CardDescription>
+              <CardTitle>Contraseña</CardTitle>
+              <CardDescription>Actualiza tu contraseña para mantener tu cuenta segura.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
-                <Input id="currentPassword" type="password" />
+                <Label>Contraseña Actual</Label>
+                <Input type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="newPassword">New Password</Label>
-                <Input id="newPassword" type="password" />
+                <Label>Nueva Contraseña</Label>
+                <Input type="password" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                <Input id="confirmPassword" type="password" />
+                <Label>Confirmar Nueva Contraseña</Label>
+                <Input type="password" />
               </div>
               <div className="flex justify-end">
-                <Button>Update Password</Button>
+                <Button>Actualizar Contraseña</Button>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle>Two-Factor Authentication</CardTitle>
-              <CardDescription>Add an extra layer of security to your account.</CardDescription>
+              <CardTitle>Autenticación de Dos Factores</CardTitle>
+              <CardDescription>Agrega una capa extra de seguridad a tu cuenta.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <p className="font-medium text-foreground">Enable 2FA</p>
-                  <p className="text-sm text-muted-foreground">
-                    Use an authenticator app for additional security
-                  </p>
+                  <p className="font-medium text-foreground">Activar 2FA</p>
+                  <p className="text-sm text-muted-foreground">Usa una app de autenticación para mayor seguridad</p>
                 </div>
-                <Button variant="outline">Enable</Button>
+                <Button variant="outline">Activar</Button>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-card border-border border-destructive/50">
             <CardHeader>
-              <CardTitle className="text-destructive">Danger Zone</CardTitle>
-              <CardDescription>Irreversible actions for your account.</CardDescription>
+              <CardTitle className="text-destructive">Zona de Peligro</CardTitle>
+              <CardDescription>Acciones irreversibles para tu cuenta.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <p className="font-medium text-foreground">Delete Account</p>
-                  <p className="text-sm text-muted-foreground">
-                    Permanently delete your account and all data
-                  </p>
+                  <p className="font-medium text-foreground">Cerrar Sesión</p>
+                  <p className="text-sm text-muted-foreground">Cierra tu sesión actual en todos los dispositivos</p>
                 </div>
-                <Button variant="destructive">Delete Account</Button>
+                <Button variant="outline" onClick={logout}>Cerrar Sesión</Button>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <p className="font-medium text-foreground">Eliminar Cuenta</p>
+                  <p className="text-sm text-muted-foreground">Eliminar permanentemente tu cuenta y todos los datos</p>
+                </div>
+                <Button variant="destructive">Eliminar Cuenta</Button>
               </div>
             </CardContent>
           </Card>

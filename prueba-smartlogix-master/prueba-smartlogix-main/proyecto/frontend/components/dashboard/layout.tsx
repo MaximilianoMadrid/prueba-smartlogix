@@ -145,28 +145,28 @@ export function DashboardHeader() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuLabel>Notificaciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-success/10 text-success">New</Badge>
-                <span className="font-medium">Order #1234 shipped</span>
+                <Badge variant="secondary" className="bg-success/10 text-success">Nuevo</Badge>
+                <span className="font-medium">Pedido #1234 enviado</span>
               </div>
-              <span className="text-xs text-muted-foreground">2 minutes ago</span>
+              <span className="text-xs text-muted-foreground">hace 2 minutos</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="bg-warning/10 text-warning">Alert</Badge>
-                <span className="font-medium">Low stock: SKU-4521</span>
+                <Badge variant="secondary" className="bg-warning/10 text-warning">Alerta</Badge>
+                <span className="font-medium">Stock bajo: SKU-4521</span>
               </div>
-              <span className="text-xs text-muted-foreground">1 hour ago</span>
+              <span className="text-xs text-muted-foreground">hace 1 hora</span>
             </DropdownMenuItem>
             <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="bg-info/10 text-info">Info</Badge>
-                <span className="font-medium">Weekly report ready</span>
+                <span className="font-medium">Reporte semanal listo</span>
               </div>
-              <span className="text-xs text-muted-foreground">3 hours ago</span>
+              <span className="text-xs text-muted-foreground">hace 3 horas</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -179,26 +179,26 @@ export function DashboardHeader() {
                 <AvatarFallback className="bg-primary text-primary-foreground">JD</AvatarFallback>
               </Avatar>
               <div className="hidden text-left md:block">
-                <p className="text-sm font-medium">John Doe</p>
+                <p className="text-sm font-medium">Max Madrid</p>
                 <p className="text-xs text-muted-foreground">Admin</p>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              Profile
+              Perfil
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              Settings
+              Configuracion
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Link href="/" className="flex items-center w-full">
-                Sign out
+                Cerrar Sesion
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
