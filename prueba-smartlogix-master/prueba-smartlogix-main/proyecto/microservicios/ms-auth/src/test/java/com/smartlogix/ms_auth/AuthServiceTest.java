@@ -1,4 +1,4 @@
-package com.smartlogixms_auth.service;
+package com.smartlogix.auth.service;
 
 import com.smartlogix.auth.dto.RegisterRequest;
 import com.smartlogix.auth.entity.User;

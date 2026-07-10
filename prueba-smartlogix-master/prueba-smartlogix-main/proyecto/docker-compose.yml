@@ -249,6 +249,13 @@ services:
     container_name: smartlogix-api-gateway
     ports:
       - "8080:8080"
+    environment:
+      MS_AUTH_URI: http://ms-auth:8081
+      MS_ORDERS_URI: http://ms-orders:8082
+      MS_INVENTORY_URI: http://ms-inventory:8083
+      MS_SHIPPING_URI: http://ms-shipping:8084
+      MS_TRACKING_URI: http://ms-tracking:8085
+      MS_NOTIFICATION_URI: http://ms-notification:8086
     depends_on:
       - ms-auth
       - ms-orders

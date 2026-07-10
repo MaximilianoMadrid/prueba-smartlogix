@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/auth_db
-    username: postgres
-    password: "1234"
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -19,5 +19,5 @@ spring:
         format_sql: true
 
 jwt:
-  secret: smartlogix-clave-super-secreta-para-secretear-2026
-  expiration: 86400000
+  secret: ${JWT_SECRET:smartlogix-clave-super-secreta-para-secretear-2026}
+  expiration: ${JWT_EXPIRATION:86400000}
