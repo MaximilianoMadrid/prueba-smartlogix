@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Search,
   Filter,
@@ -24,15 +24,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Select,
   SelectContent,
@@ -58,182 +50,102 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
+import { useAuth } from "@/lib/auth-context"
 
-// Sample shipment data
-const shipments = [
-  {
-    id: "SHP-78291",
-    orderId: "ORD-7891",
-    customer: "Maria Garcia",
-    carrier: "FedEx",
-    service: "Express",
-    tracking: "794644790191",
-    status: "in_transit",
-    origin: "Providencia",
-    destination: "Maipú",
-    estimatedDelivery: "2024-01-17",
-    weight: "1.1 kg",
-    createdAt: "2024-01-15T10:30:00",
-    events: [
-      { status: "Recogido", location: "Providencia", time: "2024-01-15T14:30:00" },
-      { status: "En transito", location: "Santiago Centro", time: "2024-01-15T22:15:00" },
-      { status: "Llego a instalacion", location: "Cerrillos", time: "2024-01-16T06:45:00" },
-    ],
-  },
-  {
-    id: "SHP-78290",
-    orderId: "ORD-7887",
-    customer: "Sarah Davis",
-    carrier: "UPS",
-    service: "Ground",
-    tracking: "1Z999AA10123456784",
-    status: "delivered",
-    origin: "Las condes",
-    destination: "Ñuñoa",
-    estimatedDelivery: "2024-01-14",
-    weight: "1.9 kg",
-    createdAt: "2024-01-10T09:15:00",
-    events: [
-      { status: "Recogido", location: "Las condes", time: "2024-01-10T11:00:00" },
-      { status: "En transito", location: "Providencia", time: "2024-01-12T08:30:00" },
-      { status: "En reparto", location: "Ñuñoa", time: "2024-01-14T07:00:00" },
-      { status: "Entregado", location: "Ñuñoa", time: "2024-01-14T14:23:00" },
-    ],
-  },
-  {
-    id: "SHP-78289",
-    orderId: "ORD-7885",
-    customer: "Lisa Anderson",
-    carrier: "DHL",
-    service: "Express",
-    tracking: "1234567890",
-    status: "processing",
-    origin: "Quinta normal",
-    destination: "La Florida",
-    estimatedDelivery: "2024-01-18",
-    weight: "3.0 kg",
-    createdAt: "2024-01-15T08:45:00",
-    events: [
-      { status: "Etiqueta creada", location: "Quinta normal", time: "2024-01-15T08:45:00" },
-    ],
-  },
-  {
-    id: "SHP-78288",
-    orderId: "ORD-7884",
-    customer: "David Kim",
-    carrier: "USPS",
-    service: "Priority",
-    tracking: "9400111899223033005291",
-    status: "delivered",
-    origin: "S. centro",
-    destination: "San Miguel",
-    estimatedDelivery: "2024-01-13",
-    weight: "0.8 kg",
-    createdAt: "2024-01-11T16:20:00",
-    events: [
-      { status: "Recogido", location: "S. centro", time: "2024-01-11T17:00:00" },
-      { status: "Entregado", location: "San Miguel", time: "2024-01-13T11:45:00" },
-    ],
-  },
-  {
-    id: "SHP-78287",
-    orderId: "ORD-7882",
-    customer: "Jennifer White",
-    carrier: "FedEx",
-    service: "Ground",
-    tracking: "794644790192",
-    status: "delayed",
-    origin: "Quinta normal",
-    destination: "Puente Alto",
-    estimatedDelivery: "2024-01-16",
-    weight: "1.4 kg",
-    createdAt: "2024-01-12T14:55:00",
-    events: [
-      { status: "Recogido", location: "Quinta normal", time: "2024-01-12T16:00:00" },
-      { status: "Retraso - Condiciones climaticas", location: "Macul", time: "2024-01-15T10:30:00" },
-    ],
-  },
-  {
-    id: "SHP-78286",
-    orderId: "ORD-7880",
-    customer: "Thomas Miller",
-    carrier: "UPS",
-    service: "Express",
-    tracking: "1Z999AA10123456785",
-    status: "out_for_delivery",
-    origin: "Providencia",
-    destination: "Peñalolén",
-    estimatedDelivery: "2024-01-16",
-    weight: "0.9 kg",
-    createdAt: "2024-01-14T10:00:00",
-    events: [
-      { status: "Recogido", location: "Providencia", time: "2024-01-14T12:00:00" },
-      { status: "En transito", location: "Ñuñoa", time: "2024-01-15T05:30:00" },
-      { status: "En reparto", location: "Peñalolén", time: "2024-01-16T07:00:00" },
-    ],
-  },
-];
-
-const statusConfig = {
-  processing: { label: "Processing", icon: Package, className: "bg-chart-2/10 text-chart-2" },
-  in_transit: { label: "In Transit", icon: Truck, className: "bg-primary/10 text-primary" },
-  out_for_delivery: { label: "Out for Delivery", icon: MapPin, className: "bg-info/10 text-info" },
-  delivered: { label: "Delivered", icon: CheckCircle2, className: "bg-success/10 text-success" },
-  delayed: { label: "Delayed", icon: AlertTriangle, className: "bg-warning/10 text-warning" },
+// Mapeo de estados del backend al frontend
+const statusConfig: Record<string, { label: string; icon: any; className: string; progress: number }> = {
+  PREPARANDO:    { label: "Preparando",   icon: Package,      className: "bg-chart-2/10 text-chart-2",   progress: 15 },
+  DESPACHADO:    { label: "Despachado",   icon: Truck,        className: "bg-primary/10 text-primary",   progress: 50 },
+  EN_TRANSITO:   { label: "En Tránsito",  icon: Truck,        className: "bg-primary/10 text-primary",   progress: 65 },
+  ENTREGADO:     { label: "Entregado",    icon: CheckCircle2, className: "bg-success/10 text-success",   progress: 100 },
+  CANCELADO:     { label: "Cancelado",    icon: AlertTriangle,className: "bg-destructive/10 text-destructive", progress: 0 },
 }
-
-type ShipmentStatus = keyof typeof statusConfig
 
 const carrierIcons: Record<string, React.ReactNode> = {
   FedEx: <Plane className="h-4 w-4" />,
-  UPS: <Truck className="h-4 w-4" />,
-  DHL: <Plane className="h-4 w-4" />,
-  USPS: <Truck className="h-4 w-4" />,
+  UPS:   <Truck className="h-4 w-4" />,
+  DHL:   <Plane className="h-4 w-4" />,
+  USPS:  <Truck className="h-4 w-4" />,
+  Chilexpress: <Truck className="h-4 w-4" />,
+  Starken: <Truck className="h-4 w-4" />,
+}
+
+interface Envio {
+  id: number
+  pedidoId: number
+  emailCliente: string
+  direccionDestino: string
+  carrier: string
+  numeroSeguimiento: string
+  estado: string
+  tipoEnvio: string
+  createdAt: string
+  updatedAt: string
 }
 
 export function ShipmentsPage() {
+  const { token } = useAuth()
+  const [shipments, setShipments] = useState<Envio[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [carrierFilter, setCarrierFilter] = useState<string>("all")
-  const [selectedShipment, setSelectedShipment] = useState<typeof shipments[0] | null>(null)
+  const [selectedShipment, setSelectedShipment] = useState<Envio | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
+
+  const fetchShipments = () => {
+    if (!token) return
+    fetch('http://localhost:8080/api/envios', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setShipments(Array.isArray(data) ? data : [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchShipments()
+  }, [token])
 
   const carriers = [...new Set(shipments.map((s) => s.carrier))]
 
   const filteredShipments = shipments.filter((shipment) => {
     const matchesSearch =
-      shipment.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      shipment.tracking.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      shipment.customer.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || shipment.status === statusFilter
+      String(shipment.id).includes(searchQuery.toLowerCase()) ||
+      shipment.numeroSeguimiento.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      shipment.emailCliente.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus = statusFilter === "all" || shipment.estado === statusFilter
     const matchesCarrier = carrierFilter === "all" || shipment.carrier === carrierFilter
     return matchesSearch && matchesStatus && matchesCarrier
   })
 
-  const openShipmentDetails = (shipment: typeof shipments[0]) => {
+  const openShipmentDetails = (shipment: Envio) => {
     setSelectedShipment(shipment)
     setDetailsOpen(true)
   }
 
-  const inTransitCount = shipments.filter((s) => s.status === "in_transit").length
-  const deliveredCount = shipments.filter((s) => s.status === "delivered").length
-  const delayedCount = shipments.filter((s) => s.status === "delayed").length
-  const processingCount = shipments.filter((s) => s.status === "processing").length
+  const preparandoCount  = shipments.filter(s => s.estado === "PREPARANDO").length
+  const enTransitoCount  = shipments.filter(s => s.estado === "EN_TRANSITO" || s.estado === "DESPACHADO").length
+  const entregadoCount   = shipments.filter(s => s.estado === "ENTREGADO").length
+  const canceladoCount   = shipments.filter(s => s.estado === "CANCELADO").length
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Envios</h1>
-          <p className="text-muted-foreground">Rastrea y gestiona todos los envios entre transportistas.</p>
+          <h1 className="text-2xl font-bold text-foreground">Envíos</h1>
+          <p className="text-muted-foreground">Rastrea y gestiona todos los envíos entre transportistas.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="gap-2">
             <Download className="h-4 w-4" />
             Exportar
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={fetchShipments}>
             <RefreshCcw className="h-4 w-4" />
             Sincronizar Todo
           </Button>
@@ -244,69 +156,58 @@ export function ShipmentsPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card border-border">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                <Truck className="h-6 w-6 text-primary" />
-              </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-chart-2/10">
+              <Package className="h-6 w-6 text-chart-2" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">En Transito</p>
-              <p className="text-2xl font-bold text-foreground">{inTransitCount}</p>
+              <p className="text-sm text-muted-foreground">Preparando</p>
+              <p className="text-2xl font-bold text-foreground">{preparandoCount}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-card border-border">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success/10">
-                <CheckCircle2 className="h-6 w-6 text-success" />
-              </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+              <Truck className="h-6 w-6 text-primary" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Entregados Hoy</p>
-              <p className="text-2xl font-bold text-foreground">{deliveredCount}</p>
+              <p className="text-sm text-muted-foreground">En Tránsito</p>
+              <p className="text-2xl font-bold text-foreground">{enTransitoCount}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-card border-border">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-warning/10">
-                <AlertTriangle className="h-6 w-6 text-warning" />
-              </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-success/10">
+              <CheckCircle2 className="h-6 w-6 text-success" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Retrasados</p>
-              <p className="text-2xl font-bold text-foreground">{delayedCount}</p>
+              <p className="text-sm text-muted-foreground">Entregados</p>
+              <p className="text-2xl font-bold text-foreground">{entregadoCount}</p>
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-card border-border">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-chart-2/10">
-                <Package className="h-6 w-6 text-chart-2" />
-              </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-destructive/10">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
             </div>
             <div className="mt-4">
-              <p className="text-sm text-muted-foreground">Procesando</p>
-              <p className="text-2xl font-bold text-foreground">{processingCount}</p>
+              <p className="text-sm text-muted-foreground">Cancelados</p>
+              <p className="text-2xl font-bold text-foreground">{canceladoCount}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Search */}
+      {/* Filters */}
       <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4 md:flex-row md:items-center">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search by ID, tracking, or customer..."
+                placeholder="Buscar por ID, seguimiento o email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 bg-secondary border-0"
@@ -314,23 +215,23 @@ export function ShipmentsPage() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-44 bg-secondary border-0">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos los Estados</SelectItem>
-                <SelectItem value="processing">Procesando</SelectItem>
-                <SelectItem value="in_transit">En Transito</SelectItem>
-                <SelectItem value="out_for_delivery">En Reparto</SelectItem>
-                <SelectItem value="delivered">Entregado</SelectItem>
-                <SelectItem value="delayed">Retrasado</SelectItem>
+                <SelectItem value="PREPARANDO">Preparando</SelectItem>
+                <SelectItem value="DESPACHADO">Despachado</SelectItem>
+                <SelectItem value="EN_TRANSITO">En Tránsito</SelectItem>
+                <SelectItem value="ENTREGADO">Entregado</SelectItem>
+                <SelectItem value="CANCELADO">Cancelado</SelectItem>
               </SelectContent>
             </Select>
             <Select value={carrierFilter} onValueChange={setCarrierFilter}>
               <SelectTrigger className="w-36 bg-secondary border-0">
-                <SelectValue placeholder="Carrier" />
+                <SelectValue placeholder="Transportista" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los Transportistas</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {carriers.map((carrier) => (
                   <SelectItem key={carrier} value={carrier}>{carrier}</SelectItem>
                 ))}
@@ -344,169 +245,160 @@ export function ShipmentsPage() {
       </Card>
 
       {/* Shipments List */}
-      <div className="grid gap-4">
-        {filteredShipments.map((shipment) => {
-          const status = statusConfig[shipment.status as ShipmentStatus]
-          const StatusIcon = status.icon
-          const progressPercentage = 
-            shipment.status === "delivered" ? 100 :
-            shipment.status === "out_for_delivery" ? 85 :
-            shipment.status === "in_transit" ? 50 :
-            shipment.status === "processing" ? 15 : 50
-
-          return (
-            <Card 
-              key={shipment.id} 
-              className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => openShipmentDetails(shipment)}
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                  {/* Left section */}
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
-                      {carrierIcons[shipment.carrier]}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground">Cargando envíos...</p>
+        </div>
+      ) : filteredShipments.length === 0 ? (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground">No hay envíos registrados.</p>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {filteredShipments.map((shipment) => {
+            const status = statusConfig[shipment.estado] ?? statusConfig.PREPARANDO
+            const StatusIcon = status.icon
+            return (
+              <Card
+                key={shipment.id}
+                className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer"
+                onClick={() => openShipmentDetails(shipment)}
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    {/* Left */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
+                        {carrierIcons[shipment.carrier] ?? <Truck className="h-4 w-4" />}
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-foreground">#{shipment.id}</span>
+                          <Badge variant="secondary" className={status.className}>
+                            <StatusIcon className="mr-1 h-3 w-3" />
+                            {status.label}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{shipment.emailCliente}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{shipment.carrier}</span>
+                          <span>•</span>
+                          <span>{shipment.numeroSeguimiento}</span>
+                          <span>•</span>
+                          <span>{shipment.tipoEnvio}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-1">
+
+                    {/* Center - Route */}
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="text-right">
+                        <p className="font-medium text-foreground">Pedido #{shipment.pedidoId}</p>
+                        <p className="text-xs text-muted-foreground">Origen</p>
+                      </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-foreground">{shipment.id}</span>
-                        <Badge variant="secondary" className={status.className}>
-                          <StatusIcon className="mr-1 h-3 w-3" />
-                          {status.label}
-                        </Badge>
+                        <div className="h-2 w-2 rounded-full bg-primary" />
+                        <div className="relative h-1 w-24 rounded-full bg-secondary">
+                          <div
+                            className="absolute h-full rounded-full bg-primary transition-all"
+                            style={{ width: `${status.progress}%` }}
+                          />
+                        </div>
+                        <div className="h-2 w-2 rounded-full bg-muted" />
                       </div>
-                      <p className="text-sm text-muted-foreground">{shipment.customer}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>{shipment.carrier} {shipment.service}</span>
-                        <span>•</span>
-                        <span>{shipment.tracking}</span>
+                      <div>
+                        <p className="font-medium text-foreground">{shipment.direccionDestino.substring(0, 20)}...</p>
+                        <p className="text-xs text-muted-foreground">Destino</p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Center section - Route */}
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="text-right">
-                      <p className="font-medium text-foreground">{shipment.origin.split(",")[0]}</p>
-                      <p className="text-xs text-muted-foreground">Origen</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-primary" />
-                      <div className="relative h-1 w-24 rounded-full bg-secondary">
-                        <div 
-                          className="absolute h-full rounded-full bg-primary transition-all"
-                          style={{ width: `${progressPercentage}%` }}
-                        />
+                    {/* Right */}
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-sm">
+                          <Calendar className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-muted-foreground">Creado:</span>
+                          <span className="font-medium text-foreground">
+                            {new Date(shipment.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Actualizado: {new Date(shipment.updatedAt).toLocaleDateString()}
+                        </p>
                       </div>
-                      <div className="h-2 w-2 rounded-full bg-muted" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">{shipment.destination.split(",")[0]}</p>
-                      <p className="text-xs text-muted-foreground">Destino</p>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openShipmentDetails(shipment) }}>
+                            <Eye className="mr-2 h-4 w-4" />Ver Detalles
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <ExternalLink className="mr-2 h-4 w-4" />Rastrear en Transportista
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Printer className="mr-2 h-4 w-4" />Imprimir Etiqueta
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
                   </div>
-
-                  {/* Right section */}
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-sm">
-                        <Calendar className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">ETA:</span>
-                        <span className="font-medium text-foreground">
-                          {new Date(shipment.estimatedDelivery).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground">{shipment.weight}</p>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openShipmentDetails(shipment); }}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Ver Detalles
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Rastrear en Sitio del Transportista
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Printer className="mr-2 h-4 w-4" />
-                          Imprimir Etiqueta
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+      )}
 
       {/* Shipment Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              Envio {selectedShipment?.id}
+              Envío #{selectedShipment?.id}
               {selectedShipment && (
-                <Badge variant="secondary" className={statusConfig[selectedShipment.status as ShipmentStatus].className}>
-                  {statusConfig[selectedShipment.status as ShipmentStatus].label}
+                <Badge variant="secondary" className={statusConfig[selectedShipment.estado]?.className}>
+                  {statusConfig[selectedShipment.estado]?.label}
                 </Badge>
               )}
             </DialogTitle>
             <DialogDescription>
-              Pedido {selectedShipment?.orderId} • {selectedShipment?.carrier} {selectedShipment?.service}
+              Pedido #{selectedShipment?.pedidoId} • {selectedShipment?.carrier} • {selectedShipment?.tipoEnvio}
             </DialogDescription>
           </DialogHeader>
           {selectedShipment && (
-            <Tabs defaultValue="tracking" className="mt-4">
+            <Tabs defaultValue="details" className="mt-4">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="tracking">Rastreo</TabsTrigger>
                 <TabsTrigger value="details">Detalles</TabsTrigger>
               </TabsList>
               <TabsContent value="tracking" className="mt-4 space-y-4">
-                {/* Progress bar */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Progreso de Entrega</span>
-                    <span className="font-medium text-foreground">
-                      {selectedShipment.status === "delivered" ? "Completed" : "In Progress"}
-                    </span>
+                    <span className="font-medium">{statusConfig[selectedShipment.estado]?.label}</span>
                   </div>
-                  <Progress 
-                    value={
-                      selectedShipment.status === "delivered" ? 100 :
-                      selectedShipment.status === "out_for_delivery" ? 85 :
-                      selectedShipment.status === "in_transit" ? 50 : 15
-                    } 
-                    className="h-2"
-                  />
+                  <Progress value={statusConfig[selectedShipment.estado]?.progress ?? 0} className="h-2" />
                 </div>
-
-                {/* Timeline */}
                 <div className="space-y-4">
-                  {selectedShipment.events.slice().reverse().map((event, i) => (
+                  {[
+                    { evento: "Envío creado",   tiempo: selectedShipment.createdAt },
+                    { evento: statusConfig[selectedShipment.estado]?.label ?? selectedShipment.estado, tiempo: selectedShipment.updatedAt },
+                  ].map((event, i, arr) => (
                     <div key={i} className="flex items-start gap-4">
                       <div className="flex flex-col items-center">
                         <div className={`h-3 w-3 rounded-full ${i === 0 ? "bg-primary" : "bg-muted"}`} />
-                        {i < selectedShipment.events.length - 1 && (
-                          <div className="h-12 w-px bg-border" />
-                        )}
+                        {i < arr.length - 1 && <div className="h-12 w-px bg-border" />}
                       </div>
                       <div className="flex-1 pb-4">
-                        <p className="font-medium text-foreground">{event.status}</p>
-                        <p className="text-sm text-muted-foreground">{event.location}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(event.time).toLocaleString()}
-                        </p>
+                        <p className="font-medium text-foreground">{event.evento}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(event.tiempo).toLocaleString()}</p>
                       </div>
                     </div>
                   ))}
@@ -515,30 +407,32 @@ export function ShipmentsPage() {
               <TabsContent value="details" className="mt-4 space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Numero de Rastreo</h4>
-                    <p className="text-foreground font-mono">{selectedShipment.tracking}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground">Número de Seguimiento</h4>
+                    <p className="text-foreground font-mono">{selectedShipment.numeroSeguimiento}</p>
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-muted-foreground">Transportista</h4>
-                    <p className="text-foreground">{selectedShipment.carrier} {selectedShipment.service}</p>
+                    <p className="text-foreground">{selectedShipment.carrier}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Origen</h4>
-                    <p className="text-foreground">{selectedShipment.origin}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground">Email Cliente</h4>
+                    <p className="text-foreground">{selectedShipment.emailCliente}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Destino</h4>
-                    <p className="text-foreground">{selectedShipment.destination}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground">Tipo de Envío</h4>
+                    <p className="text-foreground">{selectedShipment.tipoEnvio}</p>
+                  </div>
+                  <div className="space-y-2 col-span-2">
+                    <h4 className="text-sm font-medium text-muted-foreground">Dirección de Destino</h4>
+                    <p className="text-foreground">{selectedShipment.direccionDestino}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Peso</h4>
-                    <p className="text-foreground">{selectedShipment.weight}</p>
+                    <h4 className="text-sm font-medium text-muted-foreground">Creado</h4>
+                    <p className="text-foreground">{new Date(selectedShipment.createdAt).toLocaleString()}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">Entrega Estimada</h4>
-                    <p className="text-foreground">
-                      {new Date(selectedShipment.estimatedDelivery).toLocaleDateString()}
-                    </p>
+                    <h4 className="text-sm font-medium text-muted-foreground">Última Actualización</h4>
+                    <p className="text-foreground">{new Date(selectedShipment.updatedAt).toLocaleString()}</p>
                   </div>
                 </div>
                 <Separator />
