@@ -1,8 +1,9 @@
-package com.smartlogix.auth.service;
+package com.smartlogix.ms_auth;
 
 import com.smartlogix.auth.dto.RegisterRequest;
 import com.smartlogix.auth.entity.User;
 import com.smartlogix.auth.repository.UserRepository;
+import com.smartlogix.auth.service.AuthService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
